@@ -676,9 +676,9 @@
         <ol class="steps"><li>Create a project at supabase.com and run <code>supabase/schema.sql</code> in the SQL editor.</li><li>Copy the project URL and anon key into <code>config.js</code>.</li><li>In Supabase Auth settings, keep email sign-in on, and add your site URL.</li><li>Reload the app and sign in here.</li></ol>
       </div>
       <div id="account-in" hidden>
-        <div class="input-row" style="margin-top:14px"><input class="text-input" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Email"><button class="mini-btn primary" id="acct-send" type="button">Send code</button></div>
+        <div class="input-row" style="margin-top:14px"><input class="text-input" id="acct-email" name="email" type="email" autocomplete="username email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" aria-label="Email"><button class="mini-btn primary" id="acct-send" type="button">Send code</button></div>
         <div class="input-row" id="acct-code-row" hidden><input class="text-input" id="acct-code" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="Code from your email" aria-label="Email code"><button class="mini-btn primary" id="acct-verify" type="button">Verify</button></div>
-        <div class="input-row"><input class="text-input" id="acct-pass" type="password" minlength="8" autocomplete="current-password" placeholder="Or use a password (8+ characters)" aria-label="Password"></div>
+        <div class="input-row"><input class="text-input" id="acct-pass" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Or use a password (8+ characters)" aria-label="Password"></div>
         <div class="input-row"><button class="mini-btn primary" id="acct-signin" type="button" style="flex:1">Sign in</button><button class="mini-btn" id="acct-signup" type="button" style="flex:1">Create account</button></div>
       </div>
       <div id="account-signed" hidden>
@@ -2705,25 +2705,33 @@
         renderAccount();
         setAcctStatus(settings.profileDone ? "Signed in and synced." : "Signed in. Finish your profile, then tap Sync.");
       }
+      const friendlyAuthError = (error) => (/confirmation email|magic link|sending.*email/i.test(error.message)
+        ? "Supabase couldn’t send the confirmation email. In Supabase: Authentication → Sign In / Providers → Email → turn off “Confirm email”, then try again."
+        : /rate limit/i.test(error.message) ? "Too many emails sent. Wait a while, or turn off “Confirm email” in Supabase and use a password."
+        : /invalid login/i.test(error.message) ? "Wrong email or password. If this is a new account, tap Create account."
+        : error.message);
       function credentials() {
         const email = acct("acct-email").value.trim();
         const password = acct("acct-pass").value;
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setAcctStatus("Enter a valid email address."); return null; }
-        if (password.length < 8) { setAcctStatus("Password must be at least 8 characters."); return null; }
+        if (password.length < 8) { setAcctStatus("Type your password (8+ characters) in the password box."); return null; }
         return { email, password };
       }
+      acct("acct-pass").addEventListener("keydown", (event) => { if (event.key === "Enter") acct("acct-signin").click(); });
       acct("acct-signin").addEventListener("click", async () => {
         const c = credentials();
         if (!c) return;
-        try { await cloud.signInPassword(c.email, c.password); await finishSignIn(); } catch (error) { setAcctStatus(error.message); }
+        setAcctStatus("Signing in…");
+        try { await cloud.signInPassword(c.email, c.password); await finishSignIn(); } catch (error) { setAcctStatus(friendlyAuthError(error)); }
       });
       acct("acct-signup").addEventListener("click", async () => {
         const c = credentials();
         if (!c) return;
+        setAcctStatus("Creating account…");
         try {
           if (await cloud.signUpPassword(c.email, c.password)) await finishSignIn();
           else setAcctStatus("Account created. Check your email to confirm it, then tap Sign in.");
-        } catch (error) { setAcctStatus(error.message); }
+        } catch (error) { setAcctStatus(friendlyAuthError(error)); }
       });
       acct("acct-verify").addEventListener("click", async () => {
         try {
