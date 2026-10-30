@@ -71,7 +71,7 @@
     .interest { padding: 6px 9px; border: 1px solid #ffffff56; border-radius: 20px; color: white; background: #ffffff1a; backdrop-filter: blur(6px); font-size: 10px; }
     .card-progress { position: absolute; z-index: 2; top: 9px; right: 14px; left: 14px; display: flex; gap: 4px; }
     .card-progress span { height: 2px; flex: 1; border-radius: 3px; background: #ffffff75; }
-    .card-progress span:first-child { background: white; }
+    .card-progress span.on { background: white; }
     .action-row { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 14px 0 4px; }
     .action-button { display: grid; width: 54px; height: 54px; place-items: center; border: 1px solid #f0e9e3; border-radius: 50%; color: #786e67; background: white; box-shadow: 0 5px 15px #352a2210; transition: transform .18s, box-shadow .18s; }
     .action-button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px #352a2220; }
@@ -197,9 +197,38 @@
       .topbar { min-height: 62px; }
       .view-heading { margin-top: 2px; }
     }
-    .discovery-card { touch-action: pan-y; user-select: none; }
-    .discovery-card[data-swipe="like"] { outline: 4px solid #5bd69a99; }
-    .discovery-card[data-swipe="pass"] { outline: 4px solid #ee6b7299; }
+    .discovery-card { touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+    .deck { position: relative; }
+    .discovery-card.behind { position: absolute; inset: 0; z-index: 0; height: auto; transform: scale(.94) translateY(12px); opacity: .85; filter: brightness(.9); pointer-events: none; transition: transform .2s; }
+    .discovery-card#discovery-card { z-index: 1; will-change: transform; }
+    .discovery-card[data-slide="1"] .profile-photo { transform: scale(1.25); transform-origin: 50% 22%; }
+    .discovery-card[data-slide="2"] .profile-photo { filter: blur(16px) brightness(.5); transform: scale(1.12); }
+    .discovery-card:not([data-slide="0"]) .card-content { display: none; }
+    .discovery-card:not([data-slide="0"])::after { inset: 0; background: linear-gradient(180deg,#1d171400 0%,#1d1714cc 100%); }
+    .slide-panel { position: absolute; z-index: 1; right: 20px; bottom: 22px; left: 20px; color: #fff; }
+    .slide-panel small { display: block; margin: 12px 0 5px; color: #ffffffc4; font-size: 10px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
+    .slide-panel small:first-child { margin-top: 0; }
+    .slide-panel p { margin: 0; font-size: 20px; font-weight: 750; line-height: 1.3; letter-spacing: -.4px; }
+    .slide-panel p.plain { font-size: 14px; font-weight: 500; line-height: 1.55; letter-spacing: 0; }
+    .interest.shared { border-color: transparent; background: #2ed48ad9; font-weight: 700; }
+    .stamp { position: absolute; z-index: 3; padding: 4px 12px; border: 4px solid; border-radius: 10px; font-size: 30px; font-weight: 900; letter-spacing: 2px; pointer-events: none; opacity: 0; }
+    .stamp.like { top: 38px; left: 20px; color: #2ed48a; transform: rotate(-14deg); opacity: var(--like, 0); }
+    .stamp.nope { top: 38px; right: 20px; color: #ff5864; transform: rotate(14deg); opacity: var(--nope, 0); }
+    .stamp.super { top: 42%; left: 50%; color: #3aa7ff; font-size: 24px; transform: translateX(-50%) rotate(-6deg); opacity: var(--super, 0); white-space: nowrap; }
+    .action-button.pass { color: #ff5864; }
+    .action-button.rewind { width: 45px; height: 45px; color: #f5b400; }
+    .action-button.rewind svg, .action-button.super svg { width: 20px; height: 20px; }
+    .action-button.super { width: 45px; height: 45px; color: #3aa7ff; }
+    .action-button.like { background: linear-gradient(145deg,#4be0a0,#1fbf7d); box-shadow: 0 8px 19px #1fbf7d40; }
+    .deck-empty { display: grid; justify-items: center; gap: 8px; margin-top: 16px; padding: 36px 20px; border: 1px dashed #e6ddd6; border-radius: 22px; text-align: center; }
+    .deck-empty h2 { margin: 6px 0 0; font-size: 20px; letter-spacing: -.5px; }
+    .deck-empty p { margin: 0 0 8px; max-width: 280px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .radar { position: relative; display: grid; width: 96px; height: 96px; place-items: center; }
+    .radar b { z-index: 1; font-size: 34px; }
+    .radar span { position: absolute; inset: 0; border: 2px solid #f27e7b; border-radius: 50%; opacity: 0; animation: radar 2.4s ease-out infinite; }
+    .radar span + span { animation-delay: 1.2s; }
+    @keyframes radar { 0% { transform: scale(.3); opacity: .8; } 100% { transform: scale(1.1); opacity: 0; } }
+    html[data-theme="dark"] .deck-empty { border-color: #382d2a; }
     .compat { margin-left: auto; padding: 4px 8px; border-radius: 20px; color: #fff; background: #2f9b78cc; font-size: 10px; font-weight: 750; }
     .blur-photos .profile-photo, .blur-photos .like-card img { filter: blur(18px); transform: scale(1.1); }
     .shorts-view.view { padding: 0; }
@@ -394,6 +423,7 @@
     <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2.8 2.8 5.9 6.4.8-4.7 4.4 1.2 6.4-5.7-3.2-5.7 3.2 1.2-6.4-4.7-4.4 6.4-.8Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
   <main class="app">
@@ -416,8 +446,10 @@
         <div class="prompt-copy"><strong>More than a first impression</strong>See what Alex is into and start with a real conversation.</div>
         <button type="button" id="prompt-button">Say hi <span aria-hidden="true">→</span></button>
       </div>
+      <div class="deck" id="deck">
+      <article class="discovery-card behind" id="deck-behind" aria-hidden="true"><img class="profile-photo" id="behind-photo" src="" alt=""></article>
       <article class="discovery-card" id="discovery-card">
-        <img class="profile-photo" id="profile-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85" alt="Alex, smiling outdoors">
+        <img class="profile-photo" id="profile-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85" alt="Alex, smiling outdoors" draggable="false">
         <div class="card-progress" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="photo-top">
           <span class="photo-label"><span style="width:7px;height:7px;border-radius:50%;background:#79d6a5"></span>Active today</span>
@@ -429,14 +461,25 @@
           <p class="bio" id="profile-bio">Collecting little moments, big playlists, and places with really good dumplings.</p>
           <div class="interest-list" id="profile-interests"><span class="interest">Live music</span><span class="interest">Good food</span><span class="interest">Weekend trips</span></div>
         </div>
+        <div class="slide-panel" id="slide-panel" hidden></div>
+        <div class="stamp like" aria-hidden="true">LIKE</div>
+        <div class="stamp nope" aria-hidden="true">NOPE</div>
+        <div class="stamp super" aria-hidden="true">SUPER LIKE</div>
       </article>
-      <div class="action-row" aria-label="Profile actions">
-        <button class="action-button boost" id="rewind-button" type="button" aria-label="Rewind last pass"><svg><use href="#i-arrow" style="transform:rotate(180deg);transform-origin:center"/></svg></button>
+      </div>
+      <div class="deck-empty" id="deck-empty" hidden>
+        <div class="radar" aria-hidden="true"><span></span><span></span><b>🔍</b></div>
+        <h2 id="deck-empty-title"></h2>
+        <p id="deck-empty-text"></p>
+        <div class="input-row" style="justify-content:center"><button class="mini-btn primary" id="deck-reset" type="button">Start over</button><button class="mini-btn" id="deck-filters" type="button">Adjust filters</button><button class="mini-btn" id="deck-events" type="button">See events</button></div>
+      </div>
+      <div class="action-row" id="action-row" aria-label="Profile actions">
+        <button class="action-button rewind" id="rewind-button" type="button" aria-label="Rewind last pass"><svg><use href="#i-arrow" style="transform:rotate(180deg);transform-origin:center"/></svg></button>
         <button class="action-button pass" id="pass-button" type="button" aria-label="Pass"><svg><use href="#i-close"/></svg></button>
-        <button class="action-button boost" id="boost-button" type="button" aria-label="Super Like (3 left today)"><svg><use href="#i-bolt"/></svg></button>
+        <button class="action-button super" id="boost-button" type="button" aria-label="Super Like (3 left today)"><svg><use href="#i-star"/></svg></button>
         <button class="action-button like" id="like-button" type="button" aria-label="Like"><svg><use href="#i-heart"/></svg></button>
       </div>
-      <p class="action-hint">A little kindness goes a long way.</p>
+      <p class="action-hint" id="action-hint">Swipe right to like · left to pass · up for a Super Like. Tap the photo to see more.</p>
     </section>
 
     <section class="view shorts-view" id="shorts-view" aria-label="Shorts">
@@ -734,23 +777,50 @@
           else button.removeAttribute("aria-current");
         });
         $("#chat-view").classList.remove("open");
-        if (name === "events") renderEvents();({ top: 0, behavior: "smooth" });
+        if (name === "events") renderEvents();
+        window.scrollTo({ top: 0, behavior: "smooth" });
         playVisible();
       }
 
+      let slide = 0;
+      let lastShown = "";
+      let deckIsEmpty = false;
+      let flying = false;
+      const seen = new Set();
       function renderProfile() {
-        for (let i = 0; i < profiles.length && hiddenProfile(profiles[profileIndex % profiles.length]); i++) profileIndex++;
-        profileIndex %= profiles.length;
-        const profile = profiles[profileIndex % profiles.length];
+        let found = -1;
+        for (let i = 0; i < profiles.length; i++) {
+          const idx = (profileIndex + i) % profiles.length;
+          if (!hiddenProfile(profiles[idx]) && !seen.has(profiles[idx].name)) { found = idx; break; }
+        }
+        deckIsEmpty = found < 0;
+        $("#deck").hidden = deckIsEmpty;
+        $("#action-row").hidden = deckIsEmpty;
+        $("#action-hint").hidden = deckIsEmpty;
+        $("#prompt-button").closest(".prompt-strip").hidden = deckIsEmpty;
+        $("#deck-empty").hidden = !deckIsEmpty;
+        if (deckIsEmpty) {
+          const everyoneSeen = profiles.some((p) => !hiddenProfile(p));
+          $("#deck-empty-title").textContent = everyoneSeen ? "You’re all caught up" : "No one matches your filters";
+          $("#deck-empty-text").textContent = everyoneSeen ? "You’ve seen everyone nearby. Check out events to meet people in person, or start over to take a second look." : "Try widening your age range or distance to see more people.";
+          $("#deck-reset").hidden = !everyoneSeen;
+          return;
+        }
+        profileIndex = found;
+        const profile = profiles[profileIndex];
         activeMatch = profile;
         $("#profile-photo").src = profile.photo;
         $("#profile-photo").alt = `${profile.name}, smiling outdoors`;
+        const next = profiles.map((p, i) => profiles[(profileIndex + 1 + i) % profiles.length]).find((p) => p !== profile && !hiddenProfile(p) && !seen.has(p.name));
+        $("#deck-behind").hidden = !next;
+        if (next) $("#behind-photo").src = next.photo;
         $("#profile-name").textContent = `${profile.name}, ${profile.age}`;
         $("#profile-job").textContent = profile.job;
         $("#profile-distance").textContent = settings.hideDistance ? "Distance hidden" : profile.distance;
         $("#profile-compat").textContent = `${compat(profile)}% match`;
         $("#profile-bio").textContent = profile.bio;
-        $("#profile-interests").innerHTML = profile.interests.map((interest) => `<span class="interest">${esc(interest)}</span>`).join("");
+        const mineInterests = (settings.interests.length ? settings.interests : defaultInterests).map((i) => i.toLowerCase());
+        $("#profile-interests").innerHTML = profile.interests.map((interest) => { const shared = mineInterests.includes(interest.toLowerCase()); return `<span class="interest${shared ? " shared" : ""}">${shared ? "✓ " : ""}${esc(interest)}</span>`; }).join("");
         $("#detail-title").textContent = `A little more about ${profile.name}`;
         $("#detail-photo").src = profile.photo;
         $("#detail-photo").alt = profile.name;
@@ -758,6 +828,45 @@
         $("#detail-prompt-q").textContent = profile.prompt[0];
         $("#detail-prompt-a").textContent = profile.prompt[1];
         $("#detail-interests").innerHTML = profile.interests.map((interest) => `<span class="interest light">${esc(interest)}</span>`).join("");
+        setSlide(0);
+        if (lastShown !== profile.name && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          $("#discovery-card").animate([{ transform: "scale(.94) translateY(12px)", opacity: 0.7 }, { transform: "none", opacity: 1 }], { duration: 220, easing: "ease-out" });
+        }
+        lastShown = profile.name;
+      }
+
+      function setSlide(n) {
+        slide = Math.max(0, Math.min(2, n));
+        const cardEl = $("#discovery-card");
+        cardEl.dataset.slide = String(slide);
+        cardEl.querySelectorAll(".card-progress span").forEach((bar, i) => bar.classList.toggle("on", i <= slide));
+        const panel = $("#slide-panel");
+        panel.hidden = slide === 0;
+        panel.replaceChildren();
+        if (slide === 0) return;
+        const add = (tag, text, className) => { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; panel.append(el); return el; };
+        if (slide === 1) {
+          add("small", activeMatch.prompt[0]);
+          add("p", activeMatch.prompt[1]);
+          add("small", "Does that sound like you?");
+          add("p", `${activeMatch.job} · ${settings.hideDistance ? "distance hidden" : activeMatch.distance}`, "plain");
+          return;
+        }
+        const mine = (settings.interests.length ? settings.interests : defaultInterests).map((i) => i.toLowerCase());
+        const shared = activeMatch.interests.filter((i) => mine.includes(i.toLowerCase()));
+        add("small", `About ${activeMatch.name}`);
+        add("p", activeMatch.bio, "plain");
+        add("small", shared.length ? `You both like · ${compat(activeMatch)}% match` : "Passions");
+        const list = document.createElement("div");
+        list.className = "interest-list";
+        activeMatch.interests.forEach((interest) => {
+          const chip = document.createElement("span");
+          const isShared = shared.includes(interest);
+          chip.className = `interest${isShared ? " shared" : ""}`;
+          chip.textContent = `${isShared ? "✓ " : ""}${interest}`;
+          list.append(chip);
+        });
+        panel.append(list);
       }
 
       function renderLikes() {
@@ -848,42 +957,79 @@
       });
       $("#filter-button").addEventListener("click", () => $("#filters-modal").classList.add("open"));
       $("#profile-filters").addEventListener("click", () => $("#filters-modal").classList.add("open"));
-      $("#pass-button").addEventListener("click", () => {
+      function advance() {
+        seen.add(activeMatch.name);
+        profileIndex = (profileIndex + 1) % profiles.length;
+        renderProfile();
+      }
+      function doPass() {
         passHistory.push(profileIndex);
-        profileIndex = (profileIndex + 1) % profiles.length;
-        renderProfile();
+        advance();
         showToast("On to someone new ✨");
-      });
-      $("#rewind-button").addEventListener("click", () => {
-        if (!passHistory.length) return showToast("Nothing to rewind yet.");
-        profileIndex = passHistory.pop();
-        renderProfile();
-        showToast("Back to your last pass ↩");
-      });
-      $("#like-button").addEventListener("click", () => {
+      }
+      function doLike() {
         likeProfile();
-        profileIndex = (profileIndex + 1) % profiles.length;
-        renderProfile();
-      });
-      $("#detail-like").addEventListener("click", () => {
-        const comment = $("#like-comment").value.trim();
-        if (comment) activeMatch.pendingComment = comment;
-        $("#like-comment").value = "";
-        closeModal($("#profile-modal"));
-        likeProfile();
-        profileIndex = (profileIndex + 1) % profiles.length;
-        renderProfile();
-      });
-      $("#boost-button").addEventListener("click", () => {
-        if (superLikes <= 0) return showToast("No Super Likes left today. They refresh tomorrow.");
+        advance();
+      }
+      function doSuper() {
         superLikes--;
         if (superLikes < settings.bonusSuper) { settings.bonusSuper = superLikes; saveSettings(); }
         updateSuperLike();
         buzz(25);
         activeMatch.pendingComment = `⭐ Super Like — you stood out to me!`;
         likeProfile();
-        profileIndex = (profileIndex + 1) % profiles.length;
+        advance();
+      }
+      function resetCard() {
+        const cardEl = $("#discovery-card");
+        cardEl.style.transition = "transform .22s";
+        cardEl.style.transform = "";
+        ["like", "nope", "super"].forEach((name) => cardEl.style.removeProperty(`--${name}`));
+        $("#deck-behind").style.transform = "";
+      }
+      function swipeAction(dir) {
+        if (deckIsEmpty || flying) return;
+        if (dir === "super" && superLikes <= 0) {
+          resetCard();
+          return showToast("No Super Likes left today. Invite friends or check in at an event to earn more.");
+        }
+        const cardEl = $("#discovery-card");
+        const action = { like: doLike, pass: doPass, super: doSuper }[dir];
+        const x = dir === "like" ? 650 : dir === "pass" ? -650 : 0;
+        const y = dir === "super" ? -760 : 0;
+        flying = true;
+        cardEl.style.transition = "transform .25s ease-in, opacity .25s";
+        cardEl.style.transform = `translate(${x}px, ${y}px) rotate(${x / 14}deg)`;
+        cardEl.style.opacity = "0";
+        window.setTimeout(() => {
+          cardEl.style.transition = "none";
+          cardEl.style.transform = "";
+          cardEl.style.opacity = "";
+          ["like", "nope", "super"].forEach((name) => cardEl.style.removeProperty(`--${name}`));
+          $("#deck-behind").style.transform = "";
+          flying = false;
+          action();
+        }, 230);
+      }
+      $("#pass-button").addEventListener("click", () => swipeAction("pass"));
+      $("#rewind-button").addEventListener("click", () => {
+        if (!passHistory.length) return showToast("Nothing to rewind yet.");
+        profileIndex = passHistory.pop();
+        seen.delete(profiles[profileIndex].name);
         renderProfile();
+        showToast("Back to your last pass ↩");
+      });
+      $("#like-button").addEventListener("click", () => swipeAction("like"));
+      $("#boost-button").addEventListener("click", () => swipeAction("super"));
+      $("#deck-reset").addEventListener("click", () => { seen.clear(); passHistory.length = 0; renderProfile(); });
+      $("#deck-filters").addEventListener("click", () => $("#filters-modal").classList.add("open"));
+      $("#deck-events").addEventListener("click", () => setView("events"));
+      $("#detail-like").addEventListener("click", () => {
+        const comment = $("#like-comment").value.trim();
+        if (comment) activeMatch.pendingComment = comment;
+        $("#like-comment").value = "";
+        closeModal($("#profile-modal"));
+        doLike();
       });
       $("#prompt-button").addEventListener("click", async () => {
         await openChat(activeMatch);
@@ -1618,47 +1764,55 @@
       // ===== Swipe gestures & keyboard shortcuts =====
       const card = $("#discovery-card");
       let drag = null;
+      const clamp01 = (n) => Math.max(0, Math.min(1, n));
       card.addEventListener("pointerdown", (event) => {
-        if (event.target.closest("button")) return;
-        drag = { x: event.clientX, y: event.clientY, dx: 0, moved: false, id: event.pointerId };
+        if (event.target.closest("button") || deckIsEmpty || flying) return;
+        drag = { x: event.clientX, y: event.clientY, dx: 0, dy: 0, moved: false, id: event.pointerId };
       });
       card.addEventListener("pointermove", (event) => {
         if (!drag || event.pointerId !== drag.id) return;
         drag.dx = event.clientX - drag.x;
-        if (!drag.moved && Math.abs(drag.dx) > 8 && Math.abs(drag.dx) > Math.abs(event.clientY - drag.y)) {
+        drag.dy = event.clientY - drag.y;
+        if (!drag.moved && Math.hypot(drag.dx, drag.dy) > 8) {
           drag.moved = true;
           card.setPointerCapture(event.pointerId);
         }
-        if (drag.moved) {
-          card.style.transition = "none";
-          card.style.transform = `translateX(${drag.dx}px) rotate(${drag.dx / 18}deg)`;
-          card.dataset.swipe = drag.dx > 0 ? "like" : "pass";
-        }
+        if (!drag.moved) return;
+        const upward = drag.dy < -20 && Math.abs(drag.dy) > Math.abs(drag.dx) * 1.2;
+        card.style.transition = "none";
+        card.style.transform = `translate(${drag.dx}px, ${upward ? drag.dy : drag.dy * 0.25}px) rotate(${drag.dx / 18}deg)`;
+        card.style.setProperty("--like", upward ? 0 : clamp01(drag.dx / 110));
+        card.style.setProperty("--nope", upward ? 0 : clamp01(-drag.dx / 110));
+        card.style.setProperty("--super", upward ? clamp01(-drag.dy / 110) : 0);
+        const progress = Math.max(clamp01(Math.abs(drag.dx) / 110), upward ? clamp01(-drag.dy / 110) : 0);
+        $("#deck-behind").style.transform = `scale(${0.94 + 0.06 * progress}) translateY(${12 - 12 * progress}px)`;
       });
-      const endDrag = () => {
+      const endDrag = (event) => {
         if (!drag) return;
         const finished = drag;
         drag = null;
-        card.style.transition = "transform .22s";
-        if (finished.moved && Math.abs(finished.dx) > 110) {
-          card.style.transform = `translateX(${Math.sign(finished.dx) * 600}px) rotate(${finished.dx / 10}deg)`;
-          window.setTimeout(() => {
-            card.style.transition = "none";
-            card.style.transform = "";
-            delete card.dataset.swipe;
-            (finished.dx > 0 ? $("#like-button") : $("#pass-button")).click();
-          }, 180);
-        } else {
-          card.style.transform = "";
-          delete card.dataset.swipe;
+        if (!finished.moved) {
+          if (event && event.type === "pointerup") {
+            const rect = card.getBoundingClientRect();
+            const tapX = event.clientX - rect.left;
+            if (tapX < rect.width * 0.4) setSlide(slide - 1);
+            else if (tapX > rect.width * 0.6) setSlide(slide + 1);
+            else $("#profile-modal").classList.add("open");
+          }
+          return;
         }
+        if (finished.dy < -110 && Math.abs(finished.dy) > Math.abs(finished.dx) * 1.2) swipeAction("super");
+        else if (Math.abs(finished.dx) > 110) swipeAction(finished.dx > 0 ? "like" : "pass");
+        else resetCard();
       };
       card.addEventListener("pointerup", endDrag);
       card.addEventListener("pointercancel", endDrag);
       document.addEventListener("keydown", (event) => {
-        if (!$("#discover-view").classList.contains("active") || document.querySelector(".backdrop.open") || $("#chat-view").classList.contains("open") || event.target.closest("input")) return;
+        if (!$("#discover-view").classList.contains("active") || document.querySelector(".backdrop.open") || $("#chat-view").classList.contains("open") || event.target.closest("input, textarea")) return;
         if (event.key === "ArrowRight") $("#like-button").click();
         if (event.key === "ArrowLeft") $("#pass-button").click();
+        if (event.key === "ArrowUp") { event.preventDefault(); $("#boost-button").click(); }
+        if (event.key === "ArrowDown") { event.preventDefault(); setSlide(slide + 1 > 2 ? 0 : slide + 1); }
       });
 
       // ===== On-device smart typing: autocorrect, "did you mean", smart replies, polish =====
