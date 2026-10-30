@@ -335,6 +335,9 @@
     .video-stage { position: relative; margin-top: 16px; overflow: hidden; border-radius: 16px; background: #1b1513; aspect-ratio: 3 / 4; max-height: 50vh; }
     .video-remote { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; color: #ffffffb8; font-size: 12px; }
     .video-remote img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; opacity: .9; }
+    .video-remote video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+    .video-remote video[hidden] { display: none; }
+    .video-remote.live img, .video-remote.live span { display: none; }
     .video-self { position: absolute; right: 10px; bottom: 10px; width: 96px; height: 128px; overflow: hidden; border: 2px solid #fff; border-radius: 12px; background: #000; }
     .video-self video { width: 100%; height: 100%; object-fit: cover; }
     .video-self.mirror video { transform: scaleX(-1); }
@@ -702,8 +705,8 @@
   <div class="backdrop" id="video-modal" role="dialog" aria-modal="true" aria-labelledby="video-title">
     <section class="sheet">
       <div class="sheet-handle"></div>
-      <div class="sheet-head"><div><h2 id="video-title">Video date</h2><p>Demo preview: you’ll see your own camera. Live calls need a server.</p></div><button class="close-button" data-close type="button" aria-label="Close video date"><svg><use href="#i-close"/></svg></button></div>
-      <div class="video-stage"><div class="video-remote"><img id="video-remote-img" src="" alt=""><span id="video-remote-text"></span></div><div class="video-self mirror"><video id="video-self" playsinline muted></video></div></div>
+      <div class="sheet-head"><div><h2 id="video-title">Video date</h2><p id="video-sub">Demo preview: you’ll see your own camera. Live calls need a server.</p></div><button class="close-button" data-close type="button" aria-label="Close video date"><svg><use href="#i-close"/></svg></button></div>
+      <div class="video-stage"><div class="video-remote" id="video-remote"><video id="video-remote-video" playsinline autoplay hidden></video><img id="video-remote-img" src="" alt=""><span id="video-remote-text"></span></div><div class="video-self mirror"><video id="video-self" playsinline muted></video></div></div>
       <div class="video-controls"><button class="mini-btn" id="vid-mic" type="button" aria-pressed="true">🎙️ Mic</button><button class="mini-btn" id="vid-cam" type="button" aria-pressed="true">📷 Camera</button><button class="mini-btn primary" id="vid-end" type="button">End</button></div>
     </section>
   </div>
@@ -1032,7 +1035,7 @@
 
       function closeModal(modal) {
         modal.classList.remove("open");
-        if (modal.id === "create-modal" || modal.id === "verify-modal" || modal.id === "video-modal") stopCam();
+        if (modal.id === "create-modal" || modal.id === "verify-modal" || modal.id === "video-modal") { endCall(); stopCam(); }
       }
 
       function makeMatch(person, quiet = false) {
@@ -1273,15 +1276,150 @@
         renderConversations();
         replyFrom(person, chat, message);
       });
-      $("#video-button").addEventListener("click", async () => {
-        if (!activeChat) return;
-        $("#video-title").textContent = `Video date with ${activeChat.name}`;
-        $("#video-remote-img").src = activeChat.photo;
-        $("#video-remote-text").textContent = `Waiting for ${activeChat.name} to join…`;
+      // ===== Video date: real peer-to-peer call (WebRTC) signalled through Supabase for cloud matches =====
+      const RTC_CONFIG = { iceServers: [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }] };
+      let call = null;
+      let incomingBusy = false;
+      const vidText = (text) => { $("#video-remote-text").textContent = text; };
+      function prepareVideoModal(person, subtitle) {
+        $("#video-title").textContent = `Video date with ${person.name}`;
+        $("#video-sub").textContent = subtitle;
+        $("#video-remote-img").src = person.photo;
+        $("#video-remote").classList.remove("live");
+        $("#video-remote-video").hidden = true;
+        $("#video-remote-video").srcObject = null;
         $("#vid-mic").setAttribute("aria-pressed", "true");
         $("#vid-cam").setAttribute("aria-pressed", "true");
         openModal("video-modal");
-        try { await startCam($("#video-self"), true); } catch { showToast("Camera and microphone permission are needed for video dates."); }
+      }
+      function mediaError(error) {
+        if (!window.isSecureContext) return "Camera needs a secure page (https:// or localhost).";
+        if (error && error.name === "NotAllowedError") return "Camera/mic blocked. Allow them in the browser’s address-bar permissions, then try again.";
+        if (error && error.name === "NotFoundError") return "No camera or microphone was found on this device.";
+        if (error && error.name === "NotReadableError") return "Camera is being used by another app or tab. Close it and retry.";
+        return "Couldn’t start camera and microphone.";
+      }
+      async function openLocalMedia() {
+        try { await startCam($("#video-self"), true); return true; } catch (error) {
+          try { await startCam($("#video-self"), false); showToast("No microphone found — joining with video only."); return true; } catch { showToast(mediaError(error)); vidText(mediaError(error)); return false; }
+        }
+      }
+      function makePeer(person) {
+        const pc = new RTCPeerConnection(RTC_CONFIG);
+        call = { person, matchId: person.remoteMatchId, pc, lastId: 0, queue: [], timer: null, ended: false, remoteSet: false };
+        camStream.getTracks().forEach((track) => pc.addTrack(track, camStream));
+        pc.ontrack = (event) => {
+          const video = $("#video-remote-video");
+          if (video.srcObject !== event.streams[0]) video.srcObject = event.streams[0];
+          video.hidden = false;
+          $("#video-remote").classList.add("live");
+          video.play().catch(() => {});
+        };
+        pc.onicecandidate = (event) => { if (event.candidate && call && call.pc === pc) cloud.sendSignal(call.matchId, "ice", event.candidate.toJSON()).catch(() => {}); };
+        pc.onconnectionstatechange = () => {
+          if (!call || call.pc !== pc) return;
+          if (pc.connectionState === "connected") { vidText(""); $("#video-sub").textContent = "Connected · peer-to-peer, encrypted by WebRTC"; }
+          if (pc.connectionState === "failed") { vidText("Connection failed (strict network?). Try again."); }
+          if (pc.connectionState === "disconnected") vidText("Connection lost…");
+        };
+        call.timer = window.setInterval(pollSignals, 1200);
+        return call;
+      }
+      async function pollSignals() {
+        const current = call;
+        if (!current || current.ended || current.polling) return;
+        current.polling = true;
+        try {
+          const rows = (await cloud.signalsSince(current.matchId, current.lastId)) || [];
+          for (const row of rows) {
+            if (call !== current) return;
+            current.lastId = row.id;
+            if (row.kind === "answer" && !current.remoteSet) {
+              await current.pc.setRemoteDescription(row.payload);
+              current.remoteSet = true;
+              for (const candidate of current.queue.splice(0)) await current.pc.addIceCandidate(candidate).catch(() => {});
+            } else if (row.kind === "ice") {
+              if (current.remoteSet) await current.pc.addIceCandidate(row.payload).catch(() => {});
+              else current.queue.push(row.payload);
+            } else if (row.kind === "hangup") {
+              vidText(`${current.person.name} ended the call.`);
+              showToast(`${current.person.name} ended the call.`);
+              window.setTimeout(() => closeModal($("#video-modal")), 900);
+            }
+          }
+        } catch { /* try again on the next tick */ } finally { current.polling = false; }
+      }
+      function endCall() {
+        const current = call;
+        if (!current) return;
+        call = null;
+        current.ended = true;
+        window.clearInterval(current.timer);
+        try { current.pc.close(); } catch { /* already closed */ }
+        const video = $("#video-remote-video");
+        video.srcObject = null;
+        cloud.sendSignal(current.matchId, "hangup").catch(() => {}).finally(() => window.setTimeout(() => cloud.clearSignals(current.matchId).catch(() => {}), 3000));
+      }
+      async function startOutgoingCall(person) {
+        prepareVideoModal(person, "Calling… they’ll get a ring on their Instami (keep this open).");
+        vidText(`Calling ${person.name}…`);
+        if (!(await openLocalMedia())) return;
+        if (!window.RTCPeerConnection) { vidText("Your browser doesn’t support video calls."); return; }
+        try {
+          const latest = await cloud.latestSignalId(person.remoteMatchId);
+          await cloud.clearSignals(person.remoteMatchId).catch(() => {});
+          const session = makePeer(person);
+          session.lastId = latest;
+          const offer = await session.pc.createOffer();
+          await session.pc.setLocalDescription(offer);
+          await cloud.sendSignal(person.remoteMatchId, "offer", { type: offer.type, sdp: offer.sdp });
+          window.setTimeout(() => { if (call === session && session.pc.connectionState !== "connected") vidText(`${person.name} hasn’t picked up yet… still ringing`); }, 20000);
+        } catch (error) {
+          const missing = /call_signals|relation|schema cache|404/i.test(String(error && error.message));
+          vidText(missing ? "Calls aren’t enabled yet: run supabase/calls.sql in Supabase." : "Couldn’t start the call. Check your connection.");
+        }
+      }
+      async function answerCall(person, offerId) {
+        prepareVideoModal(person, "Connecting…");
+        vidText(`Connecting to ${person.name}…`);
+        if (!(await openLocalMedia())) return;
+        try {
+          const rows = (await cloud.signalsSince(person.remoteMatchId, offerId - 1)) || [];
+          const offerRow = rows.find((row) => row.kind === "offer" && row.id === offerId);
+          if (!offerRow || rows.some((row) => row.kind === "hangup" && row.id > offerId)) { vidText("That call already ended."); return; }
+          const session = makePeer(person);
+          session.lastId = offerId;
+          await session.pc.setRemoteDescription(offerRow.payload);
+          session.remoteSet = true;
+          const answer = await session.pc.createAnswer();
+          await session.pc.setLocalDescription(answer);
+          await cloud.sendSignal(person.remoteMatchId, "answer", { type: answer.type, sdp: answer.sdp });
+          for (const row of rows.filter((item) => item.kind === "ice" && item.id > offerId)) { session.lastId = Math.max(session.lastId, row.id); await session.pc.addIceCandidate(row.payload).catch(() => {}); }
+        } catch { vidText("Couldn’t connect the call."); }
+      }
+      let seenOffers = new Set();
+      async function checkIncomingCall() {
+        if (!cloud || !cloud.isSignedIn() || call || incomingBusy || document.visibilityState !== "visible") return;
+        const offers = (await cloud.incomingOffers().catch(() => null)) || [];
+        const fresh = offers.find((row) => !seenOffers.has(row.id) && Date.now() - Date.parse(row.created_at) < 45000);
+        offers.forEach((row) => seenOffers.add(row.id));
+        if (!fresh) return;
+        const person = matches.find((m) => m.remoteMatchId === fresh.match_id);
+        if (!person) { await loadCloudMatches(null, true).catch(() => {}); return; }
+        incomingBusy = true;
+        const accept = window.confirm(`📹 ${person.name} is video calling you. Answer?`);
+        incomingBusy = false;
+        if (accept) { activeChat = person; await answerCall(person, fresh.id); }
+        else cloud.sendSignal(fresh.match_id, "hangup").catch(() => {});
+      }
+      window.setInterval(() => { checkIncomingCall().catch(() => {}); }, 4000);
+
+      $("#video-button").addEventListener("click", async () => {
+        if (!activeChat) return;
+        if (activeChat.remoteMatchId && cloud && cloud.isSignedIn()) return startOutgoingCall(activeChat);
+        prepareVideoModal(activeChat, "Demo preview: this is a sample profile, so you only see your own camera. Chat with a real matched account to call live.");
+        vidText(`Waiting for ${activeChat.name} to join…`);
+        await openLocalMedia();
       });
       function toggleTrack(kind, button) {
         const tracks = camStream ? (kind === "audio" ? camStream.getAudioTracks() : camStream.getVideoTracks()) : [];

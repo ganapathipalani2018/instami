@@ -102,6 +102,22 @@
     async sendMessage(matchId, body) {
       await call("/rest/v1/messages", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ match_id: matchId, sender: me(), body }) });
     },
+    async latestSignalId(matchId) {
+      const rows = await call(`/rest/v1/call_signals?select=id&match_id=eq.${encodeURIComponent(matchId)}&order=id.desc&limit=1`);
+      return rows && rows[0] ? rows[0].id : 0;
+    },
+    async signalsSince(matchId, afterId) {
+      return call(`/rest/v1/call_signals?select=id,kind,payload,created_at&match_id=eq.${encodeURIComponent(matchId)}&sender=neq.${me()}&id=gt.${Number(afterId) || 0}&order=id.asc`);
+    },
+    async sendSignal(matchId, kind, payload = {}) {
+      await call("/rest/v1/call_signals", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ match_id: matchId, sender: me(), kind, payload }) });
+    },
+    async incomingOffers() {
+      return call(`/rest/v1/call_signals?select=id,match_id,created_at&kind=eq.offer&sender=neq.${me()}&order=id.desc&limit=5`);
+    },
+    async clearSignals(matchId) {
+      await call(`/rest/v1/call_signals?match_id=eq.${encodeURIComponent(matchId)}&sender=eq.${me()}`, { method: "DELETE", headers: { Prefer: "return=minimal" } });
+    },
     async block(targetId, reason = "") {
       await call("/rest/v1/blocks", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ blocker: me(), blocked: targetId, reason }) });
     },

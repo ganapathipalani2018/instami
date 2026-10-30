@@ -11,7 +11,7 @@ A mobile-first dating app: swipe Discover, Likes, Chats (on-device E2EE demo), S
 | Supabase accounts, profiles, matching, cloud chat | Implemented, **not yet tested against a live project** |
 | Gold plan | Simulated. No payment is taken and the plan lives on-device |
 | AI autocorrect / smart replies | Rule-based and on-device, not an LLM |
-| Video date | Shows your own camera only; live calls need a server |
+| Video date | Real peer-to-peer WebRTC call between matched cloud accounts (needs `supabase/calls.sql`); sample profiles show only your own camera. STUN only, so some strict networks need a TURN server |
 | Events, offers, rewards | Sample data, device-local |
 
 ## 1. Publish as a PWA on GitHub Pages
@@ -24,7 +24,7 @@ The invite links use the placeholder domain `instami.app`; change `inviteLink` i
 ## 2. Turn on the backend (Supabase)
 
 1. Create a free project at supabase.com.
-2. SQL editor: run `supabase/schema.sql` (tables, row-level security, mutual-like trigger, `photos` bucket).
+2. SQL editor: run `supabase/schema.sql` (tables, row-level security, mutual-like trigger, `photos` bucket), then `supabase/calls.sql` (video-call signalling).
 3. Put the project URL and **anon** key in `config.js`. Never use the `service_role` key.
 4. Auth settings: keep email sign-in on and add your site URL.
 5. Open the app → **Profile → Account & cloud sync**.
