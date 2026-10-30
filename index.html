@@ -678,6 +678,8 @@
       <div id="account-in" hidden>
         <div class="input-row" style="margin-top:14px"><input class="text-input" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Email"><button class="mini-btn primary" id="acct-send" type="button">Send code</button></div>
         <div class="input-row" id="acct-code-row" hidden><input class="text-input" id="acct-code" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="Code from your email" aria-label="Email code"><button class="mini-btn primary" id="acct-verify" type="button">Verify</button></div>
+        <div class="input-row"><input class="text-input" id="acct-pass" type="password" minlength="8" autocomplete="current-password" placeholder="Or use a password (8+ characters)" aria-label="Password"></div>
+        <div class="input-row"><button class="mini-btn primary" id="acct-signin" type="button" style="flex:1">Sign in</button><button class="mini-btn" id="acct-signup" type="button" style="flex:1">Create account</button></div>
       </div>
       <div id="account-signed" hidden>
         <div class="reward-stats"><div><strong id="acct-people">0</strong><span>People nearby</span></div><div><strong id="acct-matches">0</strong><span>Cloud matches</span></div></div>
@@ -2690,13 +2692,36 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setAcctStatus("Enter a valid email address.");
         try { await cloud.sendCode(email); acct("acct-code-row").hidden = false; setAcctStatus("We emailed you a sign-in code."); } catch (error) { setAcctStatus(error.message); }
       });
+      async function finishSignIn() {
+        if (settings.profileDone) await syncMyProfile();
+        await loadCloud();
+        renderAccount();
+        setAcctStatus(settings.profileDone ? "Signed in and synced." : "Signed in. Finish your profile, then tap Sync.");
+      }
+      function credentials() {
+        const email = acct("acct-email").value.trim();
+        const password = acct("acct-pass").value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setAcctStatus("Enter a valid email address."); return null; }
+        if (password.length < 8) { setAcctStatus("Password must be at least 8 characters."); return null; }
+        return { email, password };
+      }
+      acct("acct-signin").addEventListener("click", async () => {
+        const c = credentials();
+        if (!c) return;
+        try { await cloud.signInPassword(c.email, c.password); await finishSignIn(); } catch (error) { setAcctStatus(error.message); }
+      });
+      acct("acct-signup").addEventListener("click", async () => {
+        const c = credentials();
+        if (!c) return;
+        try {
+          if (await cloud.signUpPassword(c.email, c.password)) await finishSignIn();
+          else setAcctStatus("Account created. Check your email to confirm it, then tap Sign in.");
+        } catch (error) { setAcctStatus(error.message); }
+      });
       acct("acct-verify").addEventListener("click", async () => {
         try {
           await cloud.verifyCode(acct("acct-email").value.trim(), acct("acct-code").value.trim());
-          if (settings.profileDone) await syncMyProfile();
-          await loadCloud();
-          renderAccount();
-          setAcctStatus(settings.profileDone ? "Signed in and synced." : "Signed in. Finish your profile, then tap Sync.");
+          await finishSignIn();
         } catch (error) { setAcctStatus(error.message); }
       });
       acct("acct-sync").addEventListener("click", async () => {

@@ -50,6 +50,16 @@
       save({ access_token: data.access_token, refresh_token: data.refresh_token, user: data.user });
     },
     signOut() { save(null); },
+    async signUpPassword(email, password) {
+      const data = await call("/auth/v1/signup", { method: "POST", body: JSON.stringify({ email, password }) });
+      if (!data || !data.access_token) return false;
+      save({ access_token: data.access_token, refresh_token: data.refresh_token, user: data.user });
+      return true;
+    },
+    async signInPassword(email, password) {
+      const data = await call("/auth/v1/token?grant_type=password", { method: "POST", body: JSON.stringify({ email, password }) });
+      save({ access_token: data.access_token, refresh_token: data.refresh_token, user: data.user });
+    },
     async getMyProfile() {
       const rows = await call(`/rest/v1/profiles?id=eq.${encodeURIComponent(me())}&select=*`);
       return rows && rows[0] ? rows[0] : null;
