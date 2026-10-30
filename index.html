@@ -293,7 +293,33 @@
     html[data-theme="dark"] .comment p, html[data-theme="dark"] .detail-bio { color: #cdbfb8; }
     html[data-theme="dark"] .interest.light { color: #e0cdc4; background: #241c1a; border-color: #3a2f2b; }
     html[data-theme="dark"] .icebreakers button { color: #f3bdb5; background: #2e1f1d; border-color: #43302c; }
+    .fix-bar { display: flex; align-items: center; gap: 7px; margin: 0 13px 6px; padding: 7px 10px; border-radius: 12px; color: #1c6b52; background: #e6f6ee; font-size: 11px; flex-wrap: wrap; }
+    .fix-bar button { padding: 5px 10px; border: 0; border-radius: 14px; color: #fff; background: #2f9b78; font-size: 11px; font-weight: 700; }
+    .fix-bar button.ghost { color: #1c6b52; background: #ffffffaa; }
+    .icebreakers.smart button { border-color: #cfe9de; background: #effaf5; color: #1c6b52; }
+    .video-stage { position: relative; margin-top: 16px; overflow: hidden; border-radius: 16px; background: #1b1513; aspect-ratio: 3 / 4; max-height: 50vh; }
+    .video-remote { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; color: #ffffffb8; font-size: 12px; }
+    .video-remote img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; opacity: .9; }
+    .video-self { position: absolute; right: 10px; bottom: 10px; width: 96px; height: 128px; overflow: hidden; border: 2px solid #fff; border-radius: 12px; background: #000; }
+    .video-self video { width: 100%; height: 100%; object-fit: cover; }
+    .video-self.mirror video { transform: scaleX(-1); }
+    .video-controls { display: flex; gap: 8px; margin-top: 14px; }
+    .video-controls .mini-btn { flex: 1; padding: 12px; }
+    .video-controls .mini-btn[aria-pressed="false"] { color: #c94f57; background: #fdeceb; }
+    html[data-theme="dark"] .fix-bar { color: #aeeacd; background: #15251f; }
+    html[data-theme="dark"] .icebreakers.smart button { color: #aeeacd; background: #15251f; border-color: #234a3a; }
     .interest.light { border-color: #f0e5df; color: #77645a; background: #fff; }
+    .prompt-card { margin-top: 14px; padding: 14px; border-radius: 14px; background: #fff0e9; }
+    .prompt-card small { color: #b3675a; font-size: 10px; font-weight: 750; letter-spacing: .4px; text-transform: uppercase; }
+    .prompt-card p { margin: 6px 0 0; font-size: 16px; font-weight: 700; line-height: 1.35; letter-spacing: -.3px; }
+    .turn-tag { margin-left: 6px; padding: 2px 7px; border-radius: 10px; color: #fff; background: var(--rose); font-size: 8px; font-weight: 750; vertical-align: middle; }
+    .pick-score { position: absolute; z-index: 2; top: 9px; left: 9px; padding: 4px 8px; border-radius: 14px; color: #fff; background: #2f9b78dd; font-size: 10px; font-weight: 750; }
+    .like-card.pick { cursor: pointer; }
+    .chip-toggle { padding: 9px 13px; border: 1px solid #eadfd8; border-radius: 20px; color: #6f625b; background: #fff; font-size: 12px; font-weight: 650; }
+    .chip-toggle[aria-pressed="true"] { border-color: transparent; color: #fff; background: var(--rose); }
+    .action-button:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+    html[data-theme="dark"] .chip-toggle { color: #e0cdc4; background: #241c1a; border-color: #3a2f2b; }
+    html[data-theme="dark"] .prompt-card { background: #2b1f1c; }
     @media (min-width: 700px) { .shorts-feed { height: calc(min(920px, 100vh) - 150px); } }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -364,8 +390,9 @@
         </div>
       </article>
       <div class="action-row" aria-label="Profile actions">
+        <button class="action-button boost" id="rewind-button" type="button" aria-label="Rewind last pass"><svg><use href="#i-arrow" style="transform:rotate(180deg);transform-origin:center"/></svg></button>
         <button class="action-button pass" id="pass-button" type="button" aria-label="Pass"><svg><use href="#i-close"/></svg></button>
-        <button class="action-button boost" id="boost-button" type="button" aria-label="Send a spark"><svg><use href="#i-bolt"/></svg></button>
+        <button class="action-button boost" id="boost-button" type="button" aria-label="Super Like (3 left today)"><svg><use href="#i-bolt"/></svg></button>
         <button class="action-button like" id="like-button" type="button" aria-label="Like"><svg><use href="#i-heart"/></svg></button>
       </div>
       <p class="action-hint">A little kindness goes a long way.</p>
@@ -382,6 +409,10 @@
 
     <section class="view" id="likes-view" aria-label="People who like you">
       <div class="view-heading"><div><h1>Your admirers.</h1><p>Good things happen when you say hello.</p></div></div>
+      <h2 class="section-title" style="margin-top:4px">⭐ Today’s top picks</h2>
+      <p class="match-note" style="margin-top:0">Hand-picked daily from your interests. Update them in Profile → Edit my profile.</p>
+      <div class="likes-grid" id="picks-grid"></div>
+      <h2 class="section-title">Likes you</h2>
       <div class="match-note"><strong>✨ A little nudge:</strong> Like someone back to make a match and start chatting. Your likes stay private until you match.</div>
       <div class="likes-grid" id="likes-grid"></div>
     </section>
@@ -395,7 +426,7 @@
     <section class="view" id="profile-view" aria-label="Your profile and settings">
       <div class="view-heading"><div><h1>Your space.</h1><p>Show them what makes you, you.</p></div></div>
       <div class="profile-card">
-        <div class="my-profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Your profile photo"><div><h2>Jordan, 29 <span id="my-verified" title="Verified" hidden>✅</span></h2><p>Brooklyn · here for something real</p></div></div>
+        <div class="my-profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Your profile photo"><div><h2>Jordan, 29 <span id="my-verified" title="Verified" hidden>✅</span></h2><p id="my-bio">Brooklyn · here for something real</p></div></div>
         <div class="profile-completion"><div class="completion-label"><span>Your profile is looking good</span><span>78%</span></div><div class="progress-track"><span></span></div></div>
       </div>
       <h2 class="section-title">Your settings</h2>
@@ -424,8 +455,10 @@
       </header>
       <div class="chat-body" id="chat-body"></div>
             <div class="risk-banner" id="risk-banner" role="alert" hidden><span>🛡️</span><span id="risk-text"></span><button type="button" id="risk-dismiss" aria-label="Dismiss warning">×</button></div>
-            <div class="icebreakers" id="icebreakers" aria-label="AI conversation starters"></div>
-            <form class="chat-compose" id="chat-form"><button class="voice-button" id="voice-button" type="button" aria-label="Record a voice note">🎙️</button><input id="chat-input" type="text" maxlength="300" placeholder="Write a thoughtful message…" autocomplete="off" aria-label="Write a message"><button class="send-button" type="submit" aria-label="Send message"><svg><use href="#i-send"/></svg></button></form>
+            <div class="fix-bar" id="fix-bar" aria-live="polite" hidden></div>
+      <div class="icebreakers smart" id="smart-replies" aria-label="Smart replies" hidden></div>
+      <div class="icebreakers" id="icebreakers" aria-label="AI conversation starters"></div>
+            <form class="chat-compose" id="chat-form"><button class="voice-button" id="voice-button" type="button" aria-label="Record a voice note">🎙️</button><input id="chat-input" type="text" maxlength="300" placeholder="Write a thoughtful message…" autocomplete="off" spellcheck="true" autocapitalize="sentences" aria-label="Write a message"><button class="voice-button" id="polish-button" type="button" aria-label="Polish my message with AI" title="Polish my message">✨</button><button class="send-button" type="submit" aria-label="Send message"><svg><use href="#i-send"/></svg></button></form>
     </section>
   </main>
 
@@ -435,7 +468,7 @@
       <div class="sheet-head"><div><h2 id="filters-title">Your kind of people.</h2><p>Set the pace for who you meet.</p></div><button class="close-button" data-close type="button" aria-label="Close filters"><svg><use href="#i-close"/></svg></button></div>
       <div class="filter-group"><div class="filter-label"><span>Age range</span><span id="age-value">25 – 34</span></div><input class="range" id="age-range" type="range" min="18" max="60" value="34" aria-label="Maximum age"><div class="range-ends"><span>18 years</span><span>60 years</span></div></div>
       <div class="filter-group"><div class="filter-label"><span>Maximum distance</span><span id="distance-value">25 miles</span></div><input class="range" id="distance-range" type="range" min="1" max="100" value="25" aria-label="Maximum distance"><div class="range-ends"><span>1 mile</span><span>100 miles</span></div></div>
-      <div class="toggle-row"><span>Verified profiles only</span><button class="toggle" type="button" role="switch" aria-checked="false" aria-label="Verified profiles only"></button></div>
+      <div class="toggle-row"><span>Verified profiles only</span><button class="toggle" id="filter-verified" type="button" role="switch" aria-checked="false" aria-label="Verified profiles only"></button></div>
       <div class="toggle-row"><span>Show me to new people</span><button class="toggle" type="button" role="switch" aria-checked="true" aria-label="Show me to new people"></button></div>
       <button class="primary-cta" id="apply-filters" type="button">Show me my matches</button>
     </section>
@@ -446,9 +479,11 @@
       <div class="sheet-handle"></div>
       <div class="sheet-head"><div><h2 id="detail-title">A little more about Alex</h2><p>Verified profile · Active today</p></div><button class="close-button" data-close type="button" aria-label="Close profile"><svg><use href="#i-close"/></svg></button></div>
       <img class="detail-photo" id="detail-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85" alt="Alex">
-      <p class="detail-bio" id="detail-bio">Collecting little moments, big playlists, and places with really good dumplings. Looking for a genuine connection and someone who will split the last crispy one.</p>
+      <p class="detail-bio" id="detail-bio"></p>
       <div class="interest-list" id="detail-interests"></div>
-      <div class="detail-actions"><button type="button" id="detail-like">Send a like 💛</button><button class="danger" type="button" id="report-button">Report or block</button></div>
+            <div class="prompt-card"><small id="detail-prompt-q"></small><p id="detail-prompt-a"></p></div>
+            <div class="input-row"><input class="text-input" id="like-comment" type="text" maxlength="140" placeholder="Like their answer with a comment…" autocomplete="off" aria-label="Comment on their prompt"></div>
+      <div class="detail-actions"><button type="button" id="detail-like">Send a like with comment 💛</button><button class="danger" type="button" id="report-button">Report or block</button></div>
     </section>
   </div>
 
@@ -461,6 +496,34 @@
       <div class="match-people"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=220&q=85" alt="You"><span><svg><use href="#i-heart"/></svg></span><img id="match-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=220&q=85" alt="Your new match"></div>
       <button class="primary-cta" id="send-message-button" type="button">Start a conversation</button>
       <button class="secondary-cta" data-close type="button">Keep discovering</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="interests-modal" role="dialog" aria-modal="true" aria-labelledby="interests-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="interests-title">Edit my profile</h2><p>Your bio and interests shape your match percentage and top picks.</p></div><button class="close-button" data-close type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+      <div class="filter-group"><div class="filter-label"><span>About me</span><span id="bio-count">0/120</span></div><input class="text-input" id="bio-input" type="text" maxlength="120" placeholder="Brooklyn · here for something real" autocomplete="off" spellcheck="true" aria-label="About me"></div>
+      <div class="filter-label" style="margin-top:18px"><span>My interests</span></div>
+      <div class="interest-list" id="interest-chips"></div>
+      <button class="primary-cta" id="interests-save" type="button">Save my profile</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="notifications-modal" role="dialog" aria-modal="true" aria-labelledby="notifications-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="notifications-title">Notifications</h2><p>Matches, likes and tips.</p></div><button class="close-button" data-close type="button" aria-label="Close notifications"><svg><use href="#i-close"/></svg></button></div>
+      <div class="comment-list" id="notifications-list"></div>
+    </section>
+  </div>
+
+  <div class="backdrop" id="video-modal" role="dialog" aria-modal="true" aria-labelledby="video-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="video-title">Video date</h2><p>Demo preview: you’ll see your own camera. Live calls need a server.</p></div><button class="close-button" data-close type="button" aria-label="Close video date"><svg><use href="#i-close"/></svg></button></div>
+      <div class="video-stage"><div class="video-remote"><img id="video-remote-img" src="" alt=""><span id="video-remote-text"></span></div><div class="video-self mirror"><video id="video-self" playsinline muted></video></div></div>
+      <div class="video-controls"><button class="mini-btn" id="vid-mic" type="button" aria-pressed="true">🎙️ Mic</button><button class="mini-btn" id="vid-cam" type="button" aria-pressed="true">📷 Camera</button><button class="mini-btn primary" id="vid-end" type="button">End</button></div>
     </section>
   </div>
 
@@ -486,6 +549,7 @@
       <div class="sec-item"><svg><use href="#i-pin"/></svg><div class="sec-copy">Hide my distance<small>Distances to others are hidden too.</small></div><button class="toggle" type="button" role="switch" data-setting="hideDistance" aria-label="Hide distance"></button></div>
       <div class="sec-item"><svg><use href="#i-eye"/></svg><div class="sec-copy">Blur photos on screen<small>Great for public places. Tap off to reveal.</small></div><button class="toggle" type="button" role="switch" data-setting="blurPhotos" aria-label="Blur photos"></button></div>
       <div class="sec-item"><svg><use href="#i-chat"/></svg><div class="sec-copy">Hide message previews<small>Shows “Encrypted message” in the chat list.</small></div><button class="toggle" type="button" role="switch" data-setting="hidePreviews" aria-label="Hide message previews"></button></div>
+      <div class="sec-item"><svg><use href="#i-spark"/></svg><div class="sec-copy">Smart typing<small>On-device autocorrect, “did you mean” and smart replies. Nothing leaves your device.</small></div><button class="toggle" type="button" role="switch" data-setting="autoCorrect" aria-label="Smart typing"></button></div>
       <div class="sec-item"><svg><use href="#i-spark"/></svg><div class="sec-copy">Dark mode<small>Easier on the eyes at night.</small></div><button class="toggle" type="button" role="switch" data-setting="dark" aria-label="Dark mode"></button></div>
 
       <p class="sec-heading">Date safety</p>
@@ -541,16 +605,21 @@
   <script>
     (() => {
       const profiles = [
-        { name: "Alex", age: 28, job: "Designer", distance: "2 miles away", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85", bio: "Collecting little moments, big playlists, and places with really good dumplings.", interests: ["Live music", "Good food", "Weekend trips"], opener: "Hey! Your dumpling spot rec caught my eye 😄", preview: "Anything with chili crisp. Always chili crisp." },
-        { name: "Sam", age: 30, job: "Climate researcher", distance: "4 miles away", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=85", bio: "Usually outside, trying a new recipe, or telling my dog she’s a very good girl.", interests: ["Hiking", "Cooking", "Dogs"], opener: "Hi! I need your best easy weeknight recipe.", preview: "I’ll send you my favorite recipe!" },
-        { name: "Maya", age: 27, job: "Photographer", distance: "3 miles away", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=85", bio: "Chasing golden hour and the perfect taco. Here for thoughtful chats and spontaneous plans.", interests: ["Photography", "Tacos", "Art"], opener: "Okay, what’s the best taco spot around here?", preview: "That sounds like a perfect Saturday." },
-        { name: "Jamie", age: 29, job: "Ceramic artist", distance: "6 miles away", photo: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=85", bio: "Making wonky mugs, finding tiny bookstores, and learning how to make fresh pasta.", interests: ["Art", "Bookshops", "Pasta"], opener: "Important question: what's your favorite tiny bookstore?", preview: "I’m saving that one for this weekend." },
-        { name: "Riley", age: 31, job: "Product manager", distance: "5 miles away", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=1000&q=85", bio: "A good museum date, a bad pun, and a very long walk are my kind of plans.", interests: ["Museums", "Puns", "Long walks"], opener: "I have a museum date idea and a truly bad pun.", preview: "I'll bring my most impressive pun." }
+        { name: "Alex", age: 28, job: "Designer", distance: "2 miles away", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85", bio: "Collecting little moments, big playlists, and places with really good dumplings.", interests: ["Live music", "Good food", "Weekend trips"], miles: 2, verified: true, prompt: ["My simple pleasures", "A queue-worthy dumpling and a perfect playlist."], opener: "Hey! Your dumpling spot rec caught my eye 😄", preview: "Anything with chili crisp. Always chili crisp." },
+        { name: "Sam", age: 30, job: "Climate researcher", distance: "4 miles away", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=85", bio: "Usually outside, trying a new recipe, or telling my dog she’s a very good girl.", interests: ["Hiking", "Cooking", "Dogs"], miles: 4, verified: true, prompt: ["Together we could", "Cook something ambitious and eat it on the roof."], opener: "Hi! I need your best easy weeknight recipe.", preview: "I’ll send you my favorite recipe!" },
+        { name: "Maya", age: 27, job: "Photographer", distance: "3 miles away", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=85", bio: "Chasing golden hour and the perfect taco. Here for thoughtful chats and spontaneous plans.", interests: ["Photography", "Tacos", "Art"], miles: 3, verified: false, prompt: ["I’m weirdly good at", "Finding the best light in any room."], opener: "Okay, what’s the best taco spot around here?", preview: "That sounds like a perfect Saturday." },
+        { name: "Jamie", age: 29, job: "Ceramic artist", distance: "6 miles away", photo: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=85", bio: "Making wonky mugs, finding tiny bookstores, and learning how to make fresh pasta.", interests: ["Art", "Bookshops", "Pasta"], miles: 6, verified: true, prompt: ["The way to win me over", "Bring a book recommendation and a snack."], opener: "Important question: what's your favorite tiny bookstore?", preview: "I’m saving that one for this weekend." },
+        { name: "Riley", age: 31, job: "Product manager", distance: "5 miles away", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=1000&q=85", bio: "A good museum date, a bad pun, and a very long walk are my kind of plans.", interests: ["Museums", "Puns", "Long walks"], miles: 5, verified: false, prompt: ["Dating me is like", "A museum trip that ends with great tacos."], opener: "I have a museum date idea and a truly bad pun.", preview: "I'll bring my most impressive pun." }
       ];
       const initialLikes = [
-        { name: "Taylor", age: 27, distance: "1 mile away", photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=500&q=80" },
-        { name: "Morgan", age: 30, distance: "3 miles away", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" },
-        { name: "Casey", age: 26, distance: "4 miles away", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80" }
+        { name: "Taylor", age: 27, job: "Barista & poet", distance: "1 mile away", miles: 1, verified: true, photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=1000&q=85", bio: "Latte art by day, open-mic poems by night.", interests: ["Live music", "Art", "Long walks"], prompt: ["My simple pleasures", "A quiet café and a notebook full of bad poems."], opener: "Hi! Your profile made me smile — favorite open-mic memory?" },
+        { name: "Morgan", age: 30, job: "Chef", distance: "3 miles away", miles: 3, verified: true, photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=85", bio: "Will cook you dinner if you bring the playlist.", interests: ["Cooking", "Good food", "Tacos"], prompt: ["Together we could", "Open a very small, very loud taco stand."], opener: "Hey! I need to know your ultimate comfort food." },
+        { name: "Casey", age: 26, job: "Trail guide", distance: "4 miles away", miles: 4, verified: false, photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=85", bio: "Sunrise hikes, thermos coffee, zero cell service.", interests: ["Hiking", "Photography", "Dogs"], prompt: ["I’m weirdly good at", "Finding the best viewpoint within ten minutes."], opener: "Hi! What’s the best trail you’ve ever done?" }
+      ];
+      const admirers = [...initialLikes];
+      const notifications = [
+        { text: "Taylor, Morgan and Casey liked you 💛", read: false },
+        { text: "Verify your profile to get more matches ✅", read: false }
       ];
       const matches = [];
       let profileIndex = 0;
@@ -585,7 +654,8 @@
       }
 
       function renderProfile() {
-        for (let i = 0; i < profiles.length && settings.blocked.includes(profiles[profileIndex % profiles.length].name); i++) profileIndex++;
+        for (let i = 0; i < profiles.length && hiddenProfile(profiles[profileIndex % profiles.length]); i++) profileIndex++;
+        profileIndex %= profiles.length;
         const profile = profiles[profileIndex % profiles.length];
         activeMatch = profile;
         $("#profile-photo").src = profile.photo;
@@ -600,16 +670,29 @@
         $("#detail-photo").src = profile.photo;
         $("#detail-photo").alt = profile.name;
         $("#detail-bio").textContent = profile.bio;
+        $("#detail-prompt-q").textContent = profile.prompt[0];
+        $("#detail-prompt-a").textContent = profile.prompt[1];
         $("#detail-interests").innerHTML = profile.interests.map((interest) => `<span class="interest light">${esc(interest)}</span>`).join("");
       }
 
       function renderLikes() {
-        const people = [...initialLikes, ...matches];
-        $("#likes-grid").innerHTML = people.length
-          ? people.map((person, index) => `<article class="like-card">${safeImage(person.photo, `${person.name}'s profile`)}<button type="button" data-like-person="${index}" aria-label="Like ${person.name}"><svg><use href="#i-heart"/></svg></button><div class="like-card-info"><strong>${person.name}, ${person.age}</strong><span>${person.distance || "Nearby"}</span></div></article>`).join("")
-          : '<div class="empty-state">No likes just yet. Stay open to a little serendipity.</div>';
-        $("#likes-badge").textContent = String(people.length);
-        $("#likes-badge").hidden = people.length === 0;
+        const grid = $("#likes-grid");
+        grid.replaceChildren();
+        if (!admirers.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.style.gridColumn = "1 / -1";
+          empty.textContent = "You’re all caught up. New admirers will show up here.";
+          grid.append(empty);
+        }
+        admirers.forEach((person, index) => {
+          const el = document.createElement("article");
+          el.className = "like-card";
+          el.innerHTML = `${safeImage(person.photo, `${person.name}'s profile`)}<span class="pick-score">${compat(person)}% match</span><button type="button" data-like-person="${index}" aria-label="Like ${esc(person.name)} back"><svg><use href="#i-heart"/></svg></button><div class="like-card-info"><strong>${esc(person.name)}, ${person.age}</strong><span>${esc(person.distance)}</span></div>`;
+          grid.append(el);
+        });
+        $("#likes-badge").textContent = String(admirers.length);
+        $("#likes-badge").hidden = admirers.length === 0;
       }
 
       function renderConversations() {
@@ -618,7 +701,7 @@
           list.innerHTML = '<div class="empty-state">Your next great conversation starts with a match.<br>Head to Discover and say hello.</div>';
           return;
         }
-        list.innerHTML = matches.map((person, index) => `<button class="conversation" type="button" data-chat-person="${index}">${safeImage(person.photo, "")}<span class="conversation-copy"><span class="conversation-name">${person.name}<span class="conversation-time">${index === 0 ? "now" : "today"}</span></span><span class="conversation-preview">${settings.hidePreviews ? "🔒 Encrypted message" : esc(person.preview || "You matched! Send a hello.")}</span></span>${index === 0 ? '<span class="unread" aria-label="Unread message"></span>' : ""}</button>`).join("");
+        list.innerHTML = matches.map((person, index) => `<button class="conversation" type="button" data-chat-person="${index}">${safeImage(person.photo, "")}<span class="conversation-copy"><span class="conversation-name">${esc(person.name)}${person.yourTurn ? '<span class="turn-tag">Your turn</span>' : ""}<span class="conversation-time">${index === 0 ? "now" : "today"}</span></span><span class="conversation-preview">${settings.hidePreviews ? "🔒 Encrypted message" : esc(person.preview || "You matched! Send a hello.")}</span></span>${index === 0 ? '<span class="unread" aria-label="Unread message"></span>' : ""}</button>`).join("");
       }
 
       async function openChat(person) {
@@ -635,24 +718,36 @@
         $("#e2ee-badge").textContent = chat.key ? `🔒 End-to-end encrypted · ${chat.safety}` : "⚠ Encryption unavailable in this browser";
         if (!chat.msgs.length) {
           await pushMessage(chat, "them", person.opener || "Hey! So happy we matched 😊");
-          await pushMessage(chat, "me", "Hey! Glad we matched. What’s something good about your week?");
+          await pushMessage(chat, "me", person.pendingComment || "Hey! Glad we matched. What’s something good about your week?");
+          person.pendingComment = "";
         }
         const date = document.createElement("div");
         date.className = "chat-date";
         date.textContent = "You matched today. Say hello 👋";
         $("#chat-body").append(date);
         for (const message of chat.msgs) addBubble(message.from, await unseal(chat, message.sealed));
+        const userSpoke = chat.msgs.some((m, i) => m.from === "me" && i > 1);
+        $("#icebreakers").hidden = userSpoke;
         renderIcebreakers(person);
+        renderFixBar([]);
+        const lastThem = [...chat.msgs].reverse().find((m) => m.from === "them");
+        renderSmart(lastThem ? await unseal(chat, lastThem.sealed) : "");
+        $("#chat-badge").hidden = true;
         $("#chat-input").focus();
       }
 
       function closeModal(modal) {
         modal.classList.remove("open");
-        if (modal.id === "create-modal" || modal.id === "verify-modal") stopCam();
+        if (modal.id === "create-modal" || modal.id === "verify-modal" || modal.id === "video-modal") stopCam();
       }
 
       function likeProfile(person = activeMatch) {
-        if (!matches.some((match) => match.name === person.name)) matches.unshift(person);
+        if (!matches.some((match) => match.name === person.name)) {
+          matches.unshift(person);
+          pushNotification(`It’s a match with ${person.name} 💘`);
+        }
+        const waiting = admirers.findIndex((admirer) => admirer.name === person.name);
+        if (waiting >= 0) admirers.splice(waiting, 1);
         latestMatched = person;
         renderLikes();
         renderConversations();
@@ -669,9 +764,16 @@
       $("#filter-button").addEventListener("click", () => $("#filters-modal").classList.add("open"));
       $("#profile-filters").addEventListener("click", () => $("#filters-modal").classList.add("open"));
       $("#pass-button").addEventListener("click", () => {
+        passHistory.push(profileIndex);
         profileIndex = (profileIndex + 1) % profiles.length;
         renderProfile();
         showToast("On to someone new ✨");
+      });
+      $("#rewind-button").addEventListener("click", () => {
+        if (!passHistory.length) return showToast("Nothing to rewind yet.");
+        profileIndex = passHistory.pop();
+        renderProfile();
+        showToast("Back to your last pass ↩");
       });
       $("#like-button").addEventListener("click", () => {
         likeProfile();
@@ -679,13 +781,21 @@
         renderProfile();
       });
       $("#detail-like").addEventListener("click", () => {
+        const comment = $("#like-comment").value.trim();
+        if (comment) activeMatch.pendingComment = comment;
+        $("#like-comment").value = "";
         closeModal($("#profile-modal"));
         likeProfile();
         profileIndex = (profileIndex + 1) % profiles.length;
         renderProfile();
       });
       $("#boost-button").addEventListener("click", () => {
-        showToast(`A little spark sent to ${activeMatch.name} ✨`);
+        if (superLikes <= 0) return showToast("No Super Likes left today. They refresh tomorrow.");
+        superLikes--;
+        updateSuperLike();
+        buzz(25);
+        activeMatch.pendingComment = `⭐ Super Like — you stood out to me!`;
+        likeProfile();
         profileIndex = (profileIndex + 1) % profiles.length;
         renderProfile();
       });
@@ -705,9 +815,24 @@
         renderShorts();
         showToast(`${name} was reported and blocked. Thanks for keeping the community safe.`);
       });
-      $("#notifications-button").addEventListener("click", () => showToast("You’re all caught up 💛"));
+      $("#notifications-button").addEventListener("click", () => {
+        renderNotifications();
+        openModal("notifications-modal");
+        notifications.forEach((item) => { item.read = true; });
+        $("#notifications-button .notification-dot").hidden = true;
+      });
       $("#apply-filters").addEventListener("click", () => {
+        const next = { minAge: 25, maxAge: Number($("#age-range").value), maxMiles: Number($("#distance-range").value), verifiedOnly: $("#filter-verified").getAttribute("aria-checked") === "true" };
+        const prev = filters;
+        filters = next;
+        if (!profiles.some((p) => !hiddenProfile(p))) {
+          filters = prev;
+          return showToast("No one matches those filters yet. Try widening them.");
+        }
         closeModal($("#filters-modal"));
+        passHistory.length = 0;
+        renderProfile();
+        renderPicks();
         showToast("Your discovery preferences are updated.");
       });
       $("#age-range").addEventListener("input", (event) => {
@@ -741,21 +866,51 @@
         const input = $("#chat-input");
         const message = input.value.trim();
         if (!message || !activeChat) return;
+        if (UNKIND.test(message) && confirmedUnkind !== message) {
+          confirmedUnkind = message;
+          $("#risk-text").textContent = "Are you sure? That might come across as hurtful. Send again if you still want to.";
+          $("#risk-banner").hidden = false;
+          return;
+        }
+        confirmedUnkind = "";
         const person = activeChat;
         input.value = "";
+        renderFixBar([]);
+        $("#smart-replies").hidden = true;
+        $("#icebreakers").hidden = true;
+        lastFix = null;
         showRisk(message);
         const chat = await chatFor(person);
         await pushMessage(chat, "me", message);
         addBubble("me", message);
         person.preview = message;
+        person.yourTurn = false;
         renderConversations();
-        replyFrom(person, chat);
+        replyFrom(person, chat, message);
       });
-      $("#video-button").addEventListener("click", () => showToast("Video dates are coming soon. Keep chatting for now!"));
+      $("#video-button").addEventListener("click", async () => {
+        if (!activeChat) return;
+        $("#video-title").textContent = `Video date with ${activeChat.name}`;
+        $("#video-remote-img").src = activeChat.photo;
+        $("#video-remote-text").textContent = `Waiting for ${activeChat.name} to join…`;
+        $("#vid-mic").setAttribute("aria-pressed", "true");
+        $("#vid-cam").setAttribute("aria-pressed", "true");
+        openModal("video-modal");
+        try { await startCam($("#video-self"), true); } catch { showToast("Camera and microphone permission are needed for video dates."); }
+      });
+      function toggleTrack(kind, button) {
+        const tracks = camStream ? (kind === "audio" ? camStream.getAudioTracks() : camStream.getVideoTracks()) : [];
+        const on = button.getAttribute("aria-pressed") !== "true";
+        tracks.forEach((track) => { track.enabled = on; });
+        button.setAttribute("aria-pressed", String(on));
+      }
+      $("#vid-mic").addEventListener("click", (event) => toggleTrack("audio", event.currentTarget));
+      $("#vid-cam").addEventListener("click", (event) => toggleTrack("video", event.currentTarget));
+      $("#vid-end").addEventListener("click", () => closeModal($("#video-modal")));
       $("#likes-grid").addEventListener("click", (event) => {
         const button = event.target.closest("[data-like-person]");
         if (!button) return;
-        const person = [...initialLikes, ...matches][Number(button.dataset.likePerson)];
+        const person = admirers[Number(button.dataset.likePerson)];
         if (person) likeProfile(person);
       });
       $("#conversation-list").addEventListener("click", (event) => {
@@ -766,7 +921,7 @@
       document.querySelectorAll("[data-action]").forEach((button) => {
         button.addEventListener("click", () => {
           if (button.dataset.action === "privacy") openModal("security-modal");
-          else showToast("Profile editing is coming soon.");
+          else openInterests();
         });
       });
       $("#security-button").addEventListener("click", () => openModal("security-modal"));
@@ -780,9 +935,23 @@
       const b64e = (bytes) => btoa(String.fromCharCode(...bytes));
       const b64d = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
       const openModal = (id) => { $(`#${id}`).classList.add("open"); if (id === "security-modal") renderSecurity(); };
-      const myInterests = ["live music", "good food", "hiking", "art", "museums", "photography", "cooking", "tacos", "long walks"];
+      const ALL_INTERESTS = ["Live music", "Good food", "Weekend trips", "Hiking", "Cooking", "Dogs", "Photography", "Tacos", "Art", "Bookshops", "Pasta", "Museums", "Puns", "Long walks"];
+      const defaultInterests = ["live music", "good food", "hiking", "art", "museums", "photography", "cooking", "tacos", "long walks"];
+      const UNKIND = /\b(ugly|stupid|idiot|shut up|hate you|loser|slut|bitch|fat)\b/i;
+      let confirmedUnkind = "";
+      let filters = { minAge: 25, maxAge: 34, maxMiles: 25, verifiedOnly: false };
+      const passHistory = [];
+      let superLikes = 3;
+      const hiddenProfile = (p) => settings.blocked.includes(p.name) || p.age < filters.minAge || p.age > filters.maxAge || p.miles > filters.maxMiles || (filters.verifiedOnly && !p.verified);
+      function updateSuperLike() {
+        const button = $("#boost-button");
+        button.disabled = superLikes <= 0;
+        button.setAttribute("aria-label", `Super Like (${superLikes} left today)`);
+        button.title = `Super Like · ${superLikes} left today`;
+      }
       function compat(person) {
-        const overlap = person.interests.filter((interest) => myInterests.includes(interest.toLowerCase())).length;
+        const mine = settings.interests.length ? settings.interests.map((i) => i.toLowerCase()) : defaultInterests;
+        const overlap = person.interests.filter((interest) => mine.includes(interest.toLowerCase())).length;
         let seed = 0;
         for (const ch of person.name) seed = (seed * 31 + ch.charCodeAt(0)) % 17;
         return Math.min(98, 70 + overlap * 7 + seed);
@@ -790,7 +959,7 @@
 
       // ===== Settings, privacy & app lock =====
       const SKEY = "instami.settings.v1";
-      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], failCount: 0, lockUntil: 0 };
+      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], interests: [], autoCorrect: true, bio: "", failCount: 0, lockUntil: 0 };
       try {
         const saved = JSON.parse(localStorage.getItem(SKEY) || "{}");
         Object.keys(settings).forEach((key) => {
@@ -998,26 +1167,28 @@
       $("#risk-dismiss").addEventListener("click", () => { $("#risk-banner").hidden = true; });
       function renderIcebreakers(person) {
         const [first, second = first] = person.interests.map((interest) => interest.toLowerCase());
-        const ideas = [`What got you into ${first}?`, `Best ${second} tip you’ve got?`, "Two truths and a lie — you first?"];
+        const ideas = [`What got you into ${first}?`, `Best ${second} tip you’ve got?`, "Two truths and a lie — you first?", "📅 Coffee Saturday at 4pm at a busy café? Public spot, easy exit."];
         $("#icebreakers").replaceChildren(...ideas.map((idea) => {
           const chip = document.createElement("button");
           chip.type = "button";
-          chip.textContent = `✨ ${idea}`;
+          chip.textContent = idea.startsWith("📅") ? idea.slice(0, 22) + "…" : `✨ ${idea}`;
+          chip.title = idea;
           chip.addEventListener("click", () => { $("#chat-input").value = idea; $("#chat-input").focus(); });
           return chip;
         }));
       }
       const REPLIES = ["Haha, love that 😄", "Ooh, tell me more!", "Okay, you have great taste.", "We should plan that — coffee this week?", "That made my day, honestly."];
-      function replyFrom(person, chat) {
+      function replyFrom(person, chat, lastMine = "") {
         const typing = addBubble("them", "typing…");
         typing.classList.add("typing");
         window.setTimeout(async () => {
           typing.remove();
-          const reply = REPLIES[Math.floor(Math.random() * REPLIES.length)];
+          const reply = pick(THEIRS[intentOf(lastMine)]);
           await pushMessage(chat, "them", reply);
           person.preview = reply;
+          person.yourTurn = true;
           renderConversations();
-          if (activeChat === person) addBubble("them", reply);
+          if (activeChat === person) { addBubble("them", reply); renderSmart(reply); }
         }, 1300);
       }
       let voiceRecorder = null;
@@ -1404,7 +1575,255 @@
         if (event.key === "ArrowLeft") $("#pass-button").click();
       });
 
+      // ===== On-device smart typing: autocorrect, "did you mean", smart replies, polish =====
+      const FIXES = { teh: "the", hte: "the", adn: "and", taht: "that", wiht: "with", waht: "what", becuase: "because", becasue: "because", recieve: "receive", definately: "definitely", definatly: "definitely", defintely: "definitely", seperate: "separate", wierd: "weird", thier: "their", untill: "until", tomorow: "tomorrow", tommorow: "tomorrow", beleive: "believe", freind: "friend", realy: "really", alot: "a lot", occured: "occurred", accomodate: "accommodate", cofee: "coffee", coffe: "coffee", resturant: "restaurant", restaraunt: "restaurant", exicted: "excited", excitd: "excited", intresting: "interesting", intrested: "interested", beautifull: "beautiful", goign: "going", thnaks: "thanks", thanx: "thanks", sory: "sorry", wich: "which", whihc: "which", peice: "piece", tonigth: "tonight", weeked: "weekend", weekned: "weekend", plesae: "please", realyy: "really", amazign: "amazing", gonna: "gonna", dont: "don’t", cant: "can’t", wont: "won’t", didnt: "didn’t", doesnt: "doesn’t", isnt: "isn’t", wasnt: "wasn’t", couldnt: "couldn’t", wouldnt: "wouldn’t", shouldnt: "shouldn’t", havent: "haven’t", hasnt: "hasn’t", arent: "aren’t", im: "I’m", ive: "I’ve", youre: "you’re", theyre: "they’re", thats: "that’s", whats: "what’s", hows: "how’s", i: "I" };
+      const VOCAB_TEXT = "the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us is are was were been has had did does am im love great really very more much many here where why too still should right feel little big long small old life world house friend friends happy sorry thanks thank please yes hello hey hi cool nice awesome amazing perfect fun funny weekend tonight tomorrow today yesterday morning evening night week month coffee tea dinner lunch breakfast food eat drink drinks pizza taco tacos dumplings pasta restaurant cook cooking music song songs playlist concert movie movies book books read reading art museum museums walk walks hike hiking trip travel dog dogs cat cats photo photos picture pictures laugh smile story stories talk chat message meet meeting date plan plans free busy sure maybe definitely probably actually honestly seriously totally absolutely interesting excited excellent favorite favourite best better worst bad hard easy simple special different same together alone family job working weekend saturday sunday monday tuesday wednesday thursday friday spring summer fall winter beach park city town home café place spot public safe safely early late soon later always never sometimes often usually already again almost enough everything something anything nothing everyone someone anyone tell told ask asked answer question questions think thought wonder wondered believe believed remember forgot forget learn learned teach teaching try tried trying start started stop finished finish begin keep kept let lets put need needs needed wanted wants love loved likes liked enjoy enjoyed hope hoped wish dream dreams idea ideas thing things lot lots few every each both either neither own such only very quite pretty rather quite while during before after between through under again further once because until although though however since whether yet already else instead around across along among behind beyond inside outside within without upon toward towards against beside below above near far close open ready sound sounds looks looking feels feeling seems seem getting going doing being having making taking coming saying seeing knowing wow haha lol ok okay yeah yep nope bye goodnight welcome sweet kind kindness honest genuine real serious silly weird crazy wild quiet loud bright warm cold hot sunny rainy cozy lovely gorgeous beautiful handsome cute adorable brilliant clever smart creative curious adventurous ambitious thoughtful playful easygoing chill laid back sweetheart";
+      const VOCAB = [...new Set(VOCAB_TEXT.split(/\s+/))];
+      const VOCAB_SET = new Set(VOCAB);
+      profiles.concat(initialLikes).forEach((p) => `${p.bio} ${p.interests.join(" ")} ${p.prompt.join(" ")} ${p.job} ${p.name}`.toLowerCase().match(/[a-zà-ÿ]+/g).forEach((w) => VOCAB_SET.add(w)));
+      const TOKEN = /[A-Za-z]+(?:['’][A-Za-z]+)*/g;
+      function editDistance(a, b) {
+        const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+        for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+        for (let i = 1; i <= a.length; i++) {
+          for (let j = 1; j <= b.length; j++) {
+            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+            if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
+          }
+        }
+        return dp[a.length][b.length];
+      }
+      function suggestFor(word) {
+        const w = word.toLowerCase();
+        if (w.length < 4 || VOCAB_SET.has(w) || /['’]/.test(w)) return [];
+        const limit = w.length >= 7 ? 2 : 1;
+        const scored = [];
+        for (const candidate of VOCAB) {
+          if (Math.abs(candidate.length - w.length) > limit) continue;
+          const d = editDistance(w, candidate);
+          if (d <= limit) scored.push([d, scored.length, candidate]);
+        }
+        return scored.sort((x, y) => x[0] - y[0] || x[1] - y[1]).slice(0, 2).map((s) => (word[0] === word[0].toUpperCase() ? s[2][0].toUpperCase() + s[2].slice(1) : s[2]));
+      }
+      function matchCase(from, to) {
+        if (from.length > 1 && from === from.toUpperCase()) return to.toUpperCase();
+        return from[0] === from[0].toUpperCase() && from.length > 1 ? to[0].toUpperCase() + to.slice(1) : to;
+      }
+      let lastFix = null;
+      function renderFixBar(items) {
+        const bar = $("#fix-bar");
+        bar.replaceChildren();
+        if (!items.length) { bar.hidden = true; return; }
+        bar.hidden = false;
+        items.forEach((item) => {
+          if (item.label) { const span = document.createElement("span"); span.textContent = item.label; bar.append(span); return; }
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = item.text;
+          if (item.ghost) button.className = "ghost";
+          button.addEventListener("click", item.run);
+          bar.append(button);
+        });
+      }
+      function replaceRange(input, start, end, text) {
+        input.value = input.value.slice(0, start) + text + input.value.slice(end);
+        const caret = start + text.length;
+        input.setSelectionRange(caret, caret);
+        input.focus();
+      }
+      function analyzeTyping(event) {
+        const input = $("#chat-input");
+        if (!settings.autoCorrect) { renderFixBar([]); return; }
+        const text = input.value;
+        const caret = input.selectionStart ?? text.length;
+        const justSpaced = event && event.data === " " && /[\s.,!?;:]$/.test(text.slice(0, caret));
+        const before = text.slice(0, caret);
+        const ended = before.replace(/[\s.,!?;:]+$/, "");
+        if (ended === before) { if (!lastFix) renderFixBar([]); return; }
+        const tokens = [...ended.matchAll(TOKEN)];
+        const last = tokens[tokens.length - 1];
+        if (!last || last.index + last[0].length !== ended.length) return renderFixBar([]);
+        const word = last[0];
+        const start = last.index;
+        const end = start + word.length;
+        const known = FIXES[word.toLowerCase()];
+        if (known && justSpaced && known !== word) {
+          const fixed = word === "i" || word === "im" || word === "ive" ? known : matchCase(word, known);
+          replaceRange(input, start, end, fixed);
+          lastFix = { start, from: word, to: fixed };
+          renderFixBar([{ label: `Autocorrected “${word}” → “${fixed}”` }, { text: "↩ Undo", ghost: true, run: () => { replaceRange(input, lastFix.start, lastFix.start + lastFix.to.length, lastFix.from); lastFix = null; renderFixBar([]); } }]);
+          return;
+        }
+        lastFix = null;
+        const options = suggestFor(word);
+        if (!options.length) return renderFixBar([]);
+        renderFixBar([{ label: "Did you mean" }, ...options.map((option) => ({ text: option, run: () => { replaceRange(input, start, end, option); renderFixBar([]); } })), { text: "Keep mine", ghost: true, run: () => renderFixBar([]) }]);
+      }
+      $("#chat-input").addEventListener("input", analyzeTyping);
+      function polish(text) {
+        let out = text.replace(/\s+/g, " ").trim();
+        out = out.replace(TOKEN, (word) => {
+          const fix = FIXES[word.toLowerCase()];
+          if (fix && fix !== word) return word === "i" || word === "im" || word === "ive" ? fix : matchCase(word, fix);
+          if (word === word.toLowerCase()) { const [best] = suggestFor(word); if (best) return best; }
+          return word;
+        });
+        out = out.replace(/(^|[.!?]\s+)([a-z])/g, (_, lead, ch) => lead + ch.toUpperCase());
+        if (out && !/[.!?…💛😄😊❤️]$/u.test(out)) out += /^(what|how|why|where|when|who|do|does|are|is|can|could|would|will|should|have|did)\b/i.test(out) ? "?" : ".";
+        return out;
+      }
+      $("#polish-button").addEventListener("click", () => {
+        const input = $("#chat-input");
+        const original = input.value;
+        if (!original.trim()) return showToast("Type something first, then I’ll polish it ✨");
+        const better = polish(original);
+        if (better === original) return showToast("That already reads great 👌");
+        input.value = better;
+        input.focus();
+        lastFix = null;
+        renderFixBar([{ label: "Polished your message ✨" }, { text: "↩ Undo", ghost: true, run: () => { input.value = original; renderFixBar([]); } }]);
+      });
+      function intentOf(text) {
+        const t = text.toLowerCase();
+        if (/\b(coffee|drinks?|dinner|lunch|brunch|meet|hang ?out|free|plans?|weekend|saturday|sunday|tonight|tomorrow|date)\b/.test(t)) return "plan";
+        if (/\b(thanks|thank you|appreciate)\b/.test(t)) return "thanks";
+        if (/\b(food|eat|order|recipe|taco|dumpling|pasta|restaurant|cook|dinner)\b/.test(t)) return "food";
+        if (/\b(music|playlist|song|band|concert|gig)\b/.test(t)) return "music";
+        if (/\b(hike|trail|outdoors|travel|trip|beach|dog)\b/.test(t)) return "outdoors";
+        if (/\b(work|job|busy|week|day)\b/.test(t)) return "work";
+        if (/\b(haha|lol|funny|😂|😄)\b/.test(t)) return "laugh";
+        if (/^(hi|hey|hello|hiya)\b/.test(t)) return "greet";
+        if (t.includes("?")) return "question";
+        return "generic";
+      }
+      const SMART = {
+        plan: ["Saturday afternoon works for me!", "I’m free Sunday — want to pick a café?", "Let’s do a public spot we both like."],
+        thanks: ["Anytime! 😊", "Of course — happy to.", "You’re welcome! What else are you into?"],
+        food: ["Okay now I’m hungry 😄 What’s your go-to?", "Best thing you’ve ever eaten?", "We should try that place together."],
+        music: ["Send me your top three songs right now.", "What’s the best live show you’ve seen?", "Adding that to my playlist 🎧"],
+        outdoors: ["That sounds amazing — favorite spot?", "I’m in for a sunrise hike sometime!", "Take me along next time 😄"],
+        work: ["Sounds like a full week! How are you unwinding?", "What’s the best part of your day?", "I’d love to hear more about it."],
+        laugh: ["Haha, you’re funny 😄", "Okay that made my day.", "Tell me another!"],
+        greet: ["Hey! How’s your week going?", "Hi! Your profile made me smile.", "Hello 👋 What are you up to?"],
+        question: ["Great question — I’d say yes! You?", "Hmm, let me think… what about you?", "Honestly? I’m curious what you think."],
+        generic: ["That’s really cool, tell me more!", "Ha, I love that.", "Same here! What got you into it?"]
+      };
+      const THEIRS = {
+        plan: ["That sounds great — how does Saturday at 4 work?", "I’d love that. Somewhere public and fun?"],
+        thanks: ["Always 😊", "Of course!"],
+        food: ["Honestly, anything with chili crisp. You?", "Don’t get me started — I could talk food all day 😄"],
+        music: ["Ooh, I’ll send you a playlist tonight 🎧", "Live music is my favorite. Best show you’ve seen?"],
+        outdoors: ["Yes! Sunrise hikes are the best.", "Love that. I know a great trail nearby."],
+        work: ["Busy but good! Looking forward to the weekend.", "Always something — but chatting with you helps 😊"],
+        laugh: ["Haha, glad you think so 😄", "You’re making my day better."],
+        greet: ["Hey you! How’s your day going?", "Hi! So glad we matched 😊"],
+        question: ["Great question — let me think about that 😄", "Honestly yes! What about you?"],
+        generic: ["Haha, love that 😄", "Ooh, tell me more!", "That made my day, honestly."]
+      };
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      function renderSmart(lastThemText) {
+        const bar = $("#smart-replies");
+        bar.replaceChildren();
+        if (!settings.autoCorrect || !lastThemText) { bar.hidden = true; return; }
+        bar.hidden = false;
+        SMART[intentOf(lastThemText)].forEach((reply) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.textContent = `💬 ${reply}`;
+          chip.addEventListener("click", () => { $("#chat-input").value = reply; $("#chat-input").focus(); renderFixBar([]); });
+          bar.append(chip);
+        });
+      }
+
+      // ===== Notifications =====
+      function pushNotification(text) {
+        notifications.unshift({ text, read: false });
+        const dot = $("#notifications-button .notification-dot");
+        if (dot) dot.hidden = false;
+      }
+      function renderNotifications() {
+        const list = $("#notifications-list");
+        list.replaceChildren();
+        if (!notifications.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "You’re all caught up 💛";
+          list.append(empty);
+          return;
+        }
+        notifications.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "comment";
+          const text = document.createElement("p");
+          text.style.color = "var(--ink)";
+          text.textContent = `${item.read ? "" : "● "}${item.text}`;
+          row.append(text);
+          list.append(row);
+        });
+      }
+
+      // ===== Top picks & interests =====
+      function renderPicks() {
+        const grid = $("#picks-grid");
+        const picks = profiles.map((person, index) => ({ person, index })).filter(({ person }) => !hiddenProfile(person)).sort((a, b) => compat(b.person) - compat(a.person)).slice(0, 2);
+        grid.replaceChildren();
+        if (!picks.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.style.gridColumn = "1 / -1";
+          empty.textContent = "No picks match your filters today.";
+          grid.append(empty);
+          return;
+        }
+        picks.forEach(({ person, index }) => {
+          const el = document.createElement("article");
+          el.className = "like-card pick";
+          el.tabIndex = 0;
+          el.setAttribute("role", "button");
+          el.setAttribute("aria-label", `View ${person.name}, ${compat(person)} percent match`);
+          el.innerHTML = `${safeImage(person.photo, "")}<span class="pick-score">${compat(person)}% match</span><div class="like-card-info"><strong>${esc(person.name)}, ${person.age}</strong><span>${esc(person.job)}</span></div>`;
+          const open = () => { profileIndex = index; renderProfile(); setView("discover"); };
+          el.addEventListener("click", open);
+          el.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); } });
+          grid.append(el);
+        });
+      }
+      function renderBio() {
+        $("#my-bio").textContent = settings.bio || "Brooklyn · here for something real";
+      }
+      $("#bio-input").addEventListener("input", (event) => { $("#bio-count").textContent = `${event.target.value.length}/120`; });
+      function openInterests() {
+        $("#bio-input").value = settings.bio;
+        $("#bio-count").textContent = `${settings.bio.length}/120`;
+        const mine = new Set(settings.interests.length ? settings.interests : ALL_INTERESTS.filter((i) => defaultInterests.includes(i.toLowerCase())));
+        $("#interest-chips").replaceChildren(...ALL_INTERESTS.map((interest) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "chip-toggle";
+          chip.textContent = interest;
+          chip.setAttribute("aria-pressed", String(mine.has(interest)));
+          chip.addEventListener("click", () => chip.setAttribute("aria-pressed", String(chip.getAttribute("aria-pressed") !== "true")));
+          return chip;
+        }));
+        openModal("interests-modal");
+      }
+      $("#interests-save").addEventListener("click", () => {
+        const chosen = [...document.querySelectorAll("#interest-chips .chip-toggle")].filter((chip) => chip.getAttribute("aria-pressed") === "true").map((chip) => chip.textContent);
+        if (!chosen.length) return showToast("Pick at least one interest.");
+        settings.interests = chosen;
+        settings.bio = $("#bio-input").value.trim().slice(0, 120);
+        renderBio();
+        saveSettings();
+        closeModal($("#interests-modal"));
+        renderProfile();
+        renderPicks();
+        showToast("Matches refreshed with your interests ✨");
+      });
+
       applySettings();
+      renderBio();
+      renderPicks();
+      updateSuperLike();
       renderSecurity();
       renderShorts();
       renderProfile();
