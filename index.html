@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#fffaf7">
   <meta name="description" content="Meet people who feel like your kind of people.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src https://images.unsplash.com blob:; media-src blob: https://interactive-examples.mdn.mozilla.net https://test-videos.co.uk https://samplelib.com https://download.samplelib.com; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; img-src https://images.unsplash.com blob:; media-src blob: https://interactive-examples.mdn.mozilla.net https://test-videos.co.uk https://samplelib.com https://download.samplelib.com; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Instami — Meet your kind of people</title>
   <style>
@@ -309,6 +309,47 @@
     html[data-theme="dark"] .fix-bar { color: #aeeacd; background: #15251f; }
     html[data-theme="dark"] .icebreakers.smart button { color: #aeeacd; background: #15251f; border-color: #234a3a; }
     .interest.light { border-color: #f0e5df; color: #77645a; background: #fff; }
+    .bottom-nav .nav-button { min-width: 50px; padding: 3px 5px; }
+    .invite-banner { display: flex; width: 100%; align-items: center; gap: 12px; margin-top: 14px; padding: 13px 15px; border: 0; border-radius: 16px; color: #fff; background: linear-gradient(100deg,#f27e7b,#e75b6b); text-align: left; }
+    .invite-banner strong { display: block; font-size: 13px; }
+    .invite-banner small { display: block; margin-top: 2px; font-size: 10px; opacity: .9; }
+    .invite-banner div { flex: 1; }
+    .invite-emoji { font-size: 24px; }
+    .event-filters { display: flex; gap: 7px; margin: 14px -20px 4px; padding: 0 20px 6px; overflow-x: auto; scrollbar-width: none; }
+    .event-filters .chip-toggle { flex: none; padding: 7px 12px; font-size: 11px; }
+    .event-card { display: flex; width: 100%; gap: 12px; margin-top: 11px; padding: 11px; border: 1px solid var(--line); border-radius: 16px; background: #fff; color: var(--ink); text-align: left; }
+    .event-art { display: grid; flex: none; width: 74px; height: 74px; place-items: center; border-radius: 14px; font-size: 32px; }
+    .event-info { flex: 1; min-width: 0; }
+    .event-info strong { display: block; font-size: 13px; }
+    .event-info small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .event-tag { display: inline-block; margin-top: 5px; padding: 2px 8px; border-radius: 10px; color: #c24a58; background: #fdeceb; font-size: 9px; font-weight: 700; }
+    .event-tag.ok { color: #1c6b52; background: #e6f6ee; }
+    .event-hero { display: grid; height: 120px; margin-top: 14px; place-items: center; border-radius: 16px; font-size: 52px; }
+    .event-desc { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .attendee { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .attendee img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .attendee span { flex: 1; }
+    .attendee small { color: var(--muted); }
+    .checkin-box { margin-top: 14px; padding: 12px; border-radius: 14px; background: #f7f1ed; font-size: 12px; }
+    .checkin-box small { display: block; margin-top: 7px; color: var(--muted); font-size: 10px; }
+    .qr-box { display: grid; width: 190px; margin: 14px auto 0; padding: 8px; place-items: center; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+    .qr-box:empty { display: none; }
+    .qr-box svg { width: 100%; height: auto; }
+    .ref-code { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 0 2px; font-size: 11px; color: var(--muted); }
+    .ref-code strong { color: var(--ink); font-size: 20px; letter-spacing: 3px; }
+    .reward-stats { display: flex; gap: 8px; margin-top: 14px; }
+    .reward-stats div { flex: 1; padding: 10px 4px; border-radius: 12px; background: #f7f1ed; text-align: center; }
+    .reward-stats strong { display: block; font-size: 18px; }
+    .reward-stats span { color: var(--muted); font-size: 9px; }
+    .reward-note { margin: 8px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .offer-card { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 12px; border: 1px dashed #e4b7b9; border-radius: 14px; background: #fff; font-size: 12px; }
+    .offer-card.locked { opacity: .65; border-color: var(--line); }
+    .offer-card div { flex: 1; }
+    .offer-card small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .offer-code { padding: 5px 9px; border-radius: 9px; color: #fff; background: var(--rose); font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+    html[data-theme="dark"] .event-card, html[data-theme="dark"] .offer-card, html[data-theme="dark"] .checkin-box, html[data-theme="dark"] .reward-stats div { background: #241c1a; border-color: #382d2a; }
+    html[data-theme="dark"] .event-tag { background: #3a2226; }
+    html[data-theme="dark"] .event-tag.ok { background: #15251f; }
     .prompt-card { margin-top: 14px; padding: 14px; border-radius: 14px; background: #fff0e9; }
     .prompt-card small { color: #b3675a; font-size: 10px; font-weight: 750; letter-spacing: .4px; text-transform: uppercase; }
     .prompt-card p { margin: 6px 0 0; font-size: 16px; font-weight: 700; line-height: 1.35; letter-spacing: -.3px; }
@@ -407,6 +448,15 @@
       </div>
     </section>
 
+    <section class="view" id="events-view" aria-label="Events near you">
+      <div class="view-heading"><div><h1>Happening near you.</h1><p>Meet people at shows, lounges and meetups.</p></div></div>
+      <button class="invite-banner" id="invite-open" type="button"><span class="invite-emoji" aria-hidden="true">🎁</span><div><strong>Invite friends, earn rewards</strong><small>Free Super Likes and Boosts for every friend who joins.</small></div><span aria-hidden="true">›</span></button>
+      <div class="event-filters" id="event-filters" role="group" aria-label="Event categories"></div>
+      <div id="events-list"></div>
+      <h2 class="section-title">Partner offers</h2>
+      <div id="offers-list"></div>
+    </section>
+
     <section class="view" id="likes-view" aria-label="People who like you">
       <div class="view-heading"><div><h1>Your admirers.</h1><p>Good things happen when you say hello.</p></div></div>
       <h2 class="section-title" style="margin-top:4px">⭐ Today’s top picks</h2>
@@ -432,6 +482,7 @@
       <h2 class="section-title">Your settings</h2>
       <div class="setting-list">
         <button class="setting-row" type="button" data-action="edit"><svg><use href="#i-user"/></svg><span>Edit my profile</span><small>78% complete</small></button>
+        <button class="setting-row" type="button" id="profile-invite"><svg><use href="#i-spark"/></svg><span>Invite &amp; rewards</span><small>Earn Boosts</small></button>
         <button class="setting-row" type="button" id="profile-filters"><svg><use href="#i-filter"/></svg><span>Discovery preferences</span><small>Age, distance</small></button>
         <button class="setting-row" type="button" data-action="privacy"><svg><use href="#i-shield"/></svg><span>Security center</span><small id="profile-sec-score">Review</small></button>
       </div>
@@ -441,6 +492,7 @@
     <nav class="bottom-nav" aria-label="Main navigation">
       <button class="nav-button active" type="button" data-view="discover" aria-current="page"><svg><use href="#i-home"/></svg><span>Discover</span></button>
       <button class="nav-button" type="button" data-view="shorts"><svg><use href="#i-play"/></svg><span>Shorts</span></button>
+      <button class="nav-button" type="button" data-view="events"><svg><use href="#i-pin"/></svg><span>Events</span></button>
       <button class="nav-button" type="button" data-view="likes"><svg><use href="#i-heart"/></svg><span>Likes</span><span class="nav-badge" id="likes-badge">3</span></button>
       <button class="nav-button" type="button" data-view="messages"><svg><use href="#i-chat"/></svg><span>Chats</span><span class="nav-badge" id="chat-badge" hidden>1</span></button>
       <button class="nav-button" type="button" data-view="profile"><svg><use href="#i-user"/></svg><span>Profile</span></button>
@@ -527,6 +579,38 @@
     </section>
   </div>
 
+  <div class="backdrop" id="event-modal" role="dialog" aria-modal="true" aria-labelledby="event-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="event-title"></h2><p id="event-meta"></p></div><button class="close-button" data-close type="button" aria-label="Close event"><svg><use href="#i-close"/></svg></button></div>
+      <div class="event-hero" id="event-hero"></div>
+      <p class="event-desc" id="event-desc"></p>
+      <div class="filter-label" style="margin-top:16px"><span>Who’s going</span><span id="event-going-count"></span></div>
+      <div id="event-attendees"></div>
+      <div class="input-row"><button class="mini-btn" id="event-going" type="button" aria-pressed="false" style="flex:1"></button><button class="mini-btn" id="event-share" type="button" style="flex:1">Share event</button></div>
+      <div class="checkin-box"><strong>Check in at the venue</strong><div class="input-row"><input class="text-input" id="event-code" type="text" maxlength="12" autocomplete="off" placeholder="Venue code" aria-label="Venue code"><button class="mini-btn primary" id="event-checkin" type="button">Check in</button></div><small id="event-code-hint"></small></div>
+      <div class="qr-box" id="event-qr" aria-label="Your event pass"></div>
+    </section>
+  </div>
+
+  <div class="backdrop" id="invite-modal" role="dialog" aria-modal="true" aria-labelledby="invite-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="invite-title">Invite &amp; rewards</h2><p>Friends scan your QR or use your code. You both win.</p></div><button class="close-button" data-close type="button" aria-label="Close invite"><svg><use href="#i-close"/></svg></button></div>
+      <div class="qr-box" id="invite-qr" aria-label="Your invite QR code"></div>
+      <div class="ref-code"><span>Your code</span><strong id="invite-code"></strong></div>
+      <div class="input-row"><button class="mini-btn primary" id="invite-share" type="button" style="flex:1">Share link</button><button class="mini-btn" id="invite-copy" type="button" style="flex:1">Copy</button><button class="mini-btn" id="invite-card" type="button" style="flex:1">Save card</button></div>
+      <div class="reward-stats"><div><strong id="stat-invited">0</strong><span>Friends joined</span></div><div><strong id="stat-super">0</strong><span>Bonus Super Likes</span></div><div><strong id="stat-boost">0</strong><span>Boosts</span></div></div>
+      <button class="primary-cta" id="boost-use" type="button" style="margin-top:14px">🚀 Use a Boost (30 min)</button>
+      <p class="reward-note" id="boost-status"></p>
+      <div class="filter-label" style="margin-top:16px"><span>Have a promo code?</span></div>
+      <div class="input-row" style="margin-top:0"><input class="text-input" id="promo-input" type="text" maxlength="20" autocomplete="off" placeholder="Enter code" aria-label="Promo code"><button class="mini-btn primary" id="promo-apply" type="button">Apply</button></div>
+      <p class="reward-note">Try WELCOME, MUSICNIGHT, LAUGHS or CAMPUS. Event posters and partners can print their own codes.</p>
+      <button class="mini-btn" id="invite-demo" type="button" style="margin-top:8px">Demo: a friend joined</button>
+      <p class="reward-note">Prototype: rewards are saved on this device only. Real referral tracking needs a backend, and the link domain is a placeholder.</p>
+    </section>
+  </div>
+
   <div class="backdrop" id="security-modal" role="dialog" aria-modal="true" aria-labelledby="security-title">
     <section class="sheet">
       <div class="sheet-handle"></div>
@@ -602,6 +686,7 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="qrcode.js"></script>
   <script>
     (() => {
       const profiles = [
@@ -627,7 +712,7 @@
       let latestMatched = profiles[0];
       let toastTimer;
       const $ = (selector, root = document) => root.querySelector(selector);
-      const viewIds = ["discover", "shorts", "likes", "messages", "profile"];
+      const viewIds = ["discover", "shorts", "events", "likes", "messages", "profile"];
       const safeImage = (image, alt) => `<img src="${image}" alt="${alt}" loading="lazy">`;
 
       function showToast(message) {
@@ -649,7 +734,7 @@
           else button.removeAttribute("aria-current");
         });
         $("#chat-view").classList.remove("open");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (name === "events") renderEvents();({ top: 0, behavior: "smooth" });
         playVisible();
       }
 
@@ -792,6 +877,7 @@
       $("#boost-button").addEventListener("click", () => {
         if (superLikes <= 0) return showToast("No Super Likes left today. They refresh tomorrow.");
         superLikes--;
+        if (superLikes < settings.bonusSuper) { settings.bonusSuper = superLikes; saveSettings(); }
         updateSuperLike();
         buzz(25);
         activeMatch.pendingComment = `⭐ Super Like — you stood out to me!`;
@@ -959,7 +1045,7 @@
 
       // ===== Settings, privacy & app lock =====
       const SKEY = "instami.settings.v1";
-      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], interests: [], autoCorrect: true, bio: "", failCount: 0, lockUntil: 0 };
+      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], interests: [], autoCorrect: true, bio: "", refCode: "", referrals: 0, bonusSuper: 0, boosts: 0, boostUntil: 0, going: [], checkedIn: [], promos: [], failCount: 0, lockUntil: 0 };
       try {
         const saved = JSON.parse(localStorage.getItem(SKEY) || "{}");
         Object.keys(settings).forEach((key) => {
@@ -1496,7 +1582,7 @@
           if (act === "like") likeShort(item, el);
           if (act === "save") { item.saved = !item.saved; updateRail(el, item); showToast(item.saved ? "Saved to your collection" : "Removed from saved"); }
           if (act === "comment") { commentsFor = item; $("#comments-sub").textContent = `On ${item.author}’s short`; renderComments(); openModal("comments-modal"); }
-          if (act === "share") shareText("Instami short", `${item.author}: ${item.caption}`);
+          if (act === "share") shareText("Instami short", `${item.author}: ${item.caption} — watch more on Instami: ${inviteLink()}`);
           if (act === "follow") {
             const idx = settings.following.indexOf(item.author);
             if (idx >= 0) settings.following.splice(idx, 1); else settings.following.push(item.author);
@@ -1761,6 +1847,238 @@
           list.append(row);
         });
       }
+
+      // ===== Events, invites & rewards =====
+      const EVENTS = [
+        { id: "e1", cat: "Music", emoji: "🎸", bg: "linear-gradient(135deg,#7f5af0,#ff6b9a)", title: "Rooftop Indie Night", venue: "Skyline Lounge", when: "Fri · 8:00 PM", price: "Free with Instami", going: 142, code: "INDIE", offer: "o1", attendees: [0, 2, 4], desc: "Live indie sets, string lights and a city view. Great for easy conversation between songs." },
+        { id: "e2", cat: "Comedy", emoji: "🎤", bg: "linear-gradient(135deg,#f9a03f,#f25f5c)", title: "Laugh Lab Open Mic", venue: "The Giggle Room", when: "Sat · 7:30 PM", price: "$8", going: 96, code: "LAUGH", offer: "o2", attendees: [1, 3], desc: "Ten new comics, one fun night. Shared laughs are the best icebreaker, and front-row seats are optional." },
+        { id: "e3", cat: "Theatre", emoji: "🎭", bg: "linear-gradient(135deg,#3a506b,#9d6b9e)", title: "Midnight Garden — a play", venue: "Old Mill Theatre", when: "Sun · 6:00 PM", price: "$15 · 2-for-1 with Instami", going: 58, code: "PLAY", offer: "o3", attendees: [2, 4], desc: "An award-winning short play followed by a mixer in the foyer. Perfect first-date material." },
+        { id: "e4", cat: "Lounge", emoji: "🍸", bg: "linear-gradient(135deg,#0f2027,#2c5364)", title: "Sunset Jazz Lounge", venue: "Blue Note Terrace", when: "Thu · 6:30 PM", price: "Free entry", going: 74, code: "JAZZ", offer: "o1", attendees: [0, 1, 3], desc: "Smooth jazz, quiet corners and mocktails for those who prefer a calm night out." },
+        { id: "e5", cat: "Stream", emoji: "📺", bg: "linear-gradient(135deg,#ee0979,#ff6a00)", title: "Instami Live: First-date stories", venue: "Online · watch from anywhere", when: "Wed · 9:00 PM", price: "Free", going: 310, code: "LIVE", offer: "", attendees: [1, 2], desc: "Real stories, dating advice and live Q&A. Join the chat and meet people who laugh at the same things." },
+        { id: "e6", cat: "Campus", emoji: "🎓", bg: "linear-gradient(135deg,#11998e,#38ef7d)", title: "Campus Fest Mixer", venue: "University Quad", when: "Sat · 4:00 PM", price: "Free for students", going: 420, code: "FEST", offer: "o2", attendees: [3, 4, 0], desc: "Food trucks, DJ sets and games. Bring a friend and meet new people in a safe, public space." }
+      ];
+      const OFFERS = [
+        { id: "o1", brand: "Brew & Bean Café", text: "Buy one coffee, get one free on your first date", code: "BREW2" },
+        { id: "o2", brand: "Slice Society Pizza", text: "20% off for two", code: "SLICE20" },
+        { id: "o3", brand: "Old Mill Theatre", text: "2-for-1 tickets on Sundays", code: "MILL241" }
+      ];
+      const PROMOS = { WELCOME: { super: 3, label: "3 free Super Likes" }, MUSICNIGHT: { boost: 1, label: "a free Boost" }, LAUGHS: { super: 1, boost: 1, label: "1 Super Like and a Boost" }, CAMPUS: { super: 2, label: "2 free Super Likes" } };
+      let eventCat = "All";
+      let openedEvent = null;
+      if (!settings.refCode) {
+        const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+        settings.refCode = "JORD" + Array.from(crypto.getRandomValues(new Uint8Array(4)), (n) => alphabet[n % alphabet.length]).join("");
+        saveSettings();
+      }
+      superLikes += settings.bonusSuper;
+      const inviteLink = () => `https://instami.app/join?ref=${settings.refCode}`;
+      function qrSvg(text) {
+        if (typeof qrcode !== "function") return "";
+        const qr = qrcode(0, "M");
+        qr.addData(text);
+        qr.make();
+        return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+      }
+      const goingCount = (event) => event.going + (settings.going.includes(event.id) ? 1 : 0);
+      const offersUnlocked = () => settings.checkedIn.length > 0 || matches.length > 0;
+      function renderEvents() {
+        const cats = ["All", ...new Set(EVENTS.map((event) => event.cat))];
+        $("#event-filters").replaceChildren(...cats.map((cat) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "chip-toggle";
+          chip.textContent = cat;
+          chip.setAttribute("aria-pressed", String(cat === eventCat));
+          chip.addEventListener("click", () => { eventCat = cat; renderEvents(); });
+          return chip;
+        }));
+        const list = $("#events-list");
+        list.replaceChildren();
+        EVENTS.filter((event) => eventCat === "All" || event.cat === eventCat).forEach((event) => {
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = "event-card";
+          card.setAttribute("aria-label", `${event.title}, ${event.when}, ${event.venue}`);
+          const checked = settings.checkedIn.includes(event.id);
+          const status = checked ? `<span class="event-tag ok">✔ Checked in</span>` : settings.going.includes(event.id) ? `<span class="event-tag ok">You’re going</span>` : `<span class="event-tag">${esc(event.price)}</span>`;
+          card.innerHTML = `<div class="event-art" style="background:${event.bg}" aria-hidden="true">${event.emoji}</div><div class="event-info"><strong>${esc(event.title)}</strong><small>${esc(event.venue)}<br>${esc(event.when)} · ${goingCount(event)} going</small>${status}</div>`;
+          card.addEventListener("click", () => openEventSheet(event));
+          list.append(card);
+        });
+        renderOffers();
+      }
+      function renderOffers() {
+        const unlocked = offersUnlocked();
+        const list = $("#offers-list");
+        list.replaceChildren();
+        OFFERS.forEach((offer) => {
+          const row = document.createElement("div");
+          row.className = `offer-card${unlocked ? "" : " locked"}`;
+          row.innerHTML = `<span aria-hidden="true">${unlocked ? "🎟️" : "🔒"}</span><div><strong>${esc(offer.brand)}</strong><small>${esc(offer.text)}</small></div>${unlocked ? `<span class="offer-code">${esc(offer.code)}</span>` : `<small>Match or check in</small>`}`;
+          list.append(row);
+        });
+      }
+      function openEventSheet(event) {
+        openedEvent = event;
+        $("#event-title").textContent = event.title;
+        $("#event-meta").textContent = `${event.venue} · ${event.when}`;
+        const hero = $("#event-hero");
+        hero.style.background = event.bg;
+        hero.textContent = event.emoji;
+        $("#event-desc").textContent = event.desc;
+        $("#event-code").value = "";
+        $("#event-code-hint").textContent = `Prototype: type the demo venue code ${event.code}. Real venues would show a QR code to scan.`;
+        refreshEventSheet();
+        openModal("event-modal");
+      }
+      function refreshEventSheet() {
+        const event = openedEvent;
+        const going = settings.going.includes(event.id);
+        const checked = settings.checkedIn.includes(event.id);
+        $("#event-going-count").textContent = `${goingCount(event)} people`;
+        const button = $("#event-going");
+        button.textContent = going ? "✔ I’m going" : "I’m going";
+        button.setAttribute("aria-pressed", String(going));
+        $("#event-checkin").disabled = checked;
+        $("#event-checkin").textContent = checked ? "Checked in" : "Check in";
+        $("#event-qr").innerHTML = going || checked ? qrSvg(`instami:pass:${event.id}:${settings.refCode}`) : "";
+        const box = $("#event-attendees");
+        box.replaceChildren();
+        event.attendees.map((i) => profiles[i]).filter((p) => p && !settings.blocked.includes(p.name)).forEach((person) => {
+          const row = document.createElement("div");
+          row.className = "attendee";
+          row.innerHTML = `${safeImage(person.photo, `${person.name}`)}<span><strong>${esc(person.name)}, ${person.age}</strong><br><small>${compat(person)}% match · going</small></span>`;
+          const like = document.createElement("button");
+          like.type = "button";
+          like.className = "mini-btn primary";
+          like.textContent = "Say hi 👋";
+          like.addEventListener("click", () => { closeModal($("#event-modal")); likeProfile(person); });
+          row.append(like);
+          box.append(row);
+        });
+      }
+      function grant({ super: s = 0, boost: b = 0 }) {
+        settings.bonusSuper += s;
+        superLikes += s;
+        settings.boosts += b;
+        saveSettings();
+        updateSuperLike();
+        renderInvite();
+      }
+      $("#event-going").addEventListener("click", () => {
+        const id = openedEvent.id;
+        settings.going = settings.going.includes(id) ? settings.going.filter((x) => x !== id) : [...settings.going, id];
+        saveSettings();
+        refreshEventSheet();
+        renderEvents();
+        if (settings.going.includes(id)) showToast("You’re on the list! Your pass is below 🎟️");
+      });
+      $("#event-checkin").addEventListener("click", () => {
+        const event = openedEvent;
+        if ($("#event-code").value.trim().toUpperCase() !== event.code) return showToast("That venue code doesn’t match. Check with the host.");
+        settings.checkedIn = [...settings.checkedIn, event.id];
+        if (!settings.going.includes(event.id)) settings.going = [...settings.going, event.id];
+        saveSettings();
+        grant({ super: 1 });
+        pushNotification(`Checked in at ${event.title}: +1 Super Like and new partner offers unlocked 🎁`);
+        buzz(25);
+        showToast("Checked in! +1 Super Like and offers unlocked 🎁");
+        refreshEventSheet();
+        renderEvents();
+      });
+      $("#event-share").addEventListener("click", () => shareText(openedEvent.title, `I’m going to ${openedEvent.title} (${openedEvent.when}) — join me on Instami: ${inviteLink()}`));
+
+      function renderInvite() {
+        $("#invite-qr").innerHTML = qrSvg(inviteLink());
+        $("#invite-code").textContent = settings.refCode;
+        $("#stat-invited").textContent = settings.referrals;
+        $("#stat-super").textContent = settings.bonusSuper;
+        $("#stat-boost").textContent = settings.boosts;
+        const left = settings.boostUntil - Date.now();
+        $("#boost-status").textContent = left > 0 ? `🚀 Boost active — about ${Math.ceil(left / 60000)} min left. You’re shown to more people nearby.` : "Boosts show your profile to more people nearby for 30 minutes.";
+        $("#boost-use").disabled = settings.boosts <= 0 || left > 0;
+      }
+      function openInvite() { renderInvite(); openModal("invite-modal"); }
+      $("#invite-open").addEventListener("click", openInvite);
+      $("#profile-invite").addEventListener("click", openInvite);
+      $("#invite-share").addEventListener("click", () => shareText("Join me on Instami", `Find your kind of people on Instami. Use my code ${settings.refCode}: ${inviteLink()}`));
+      $("#invite-copy").addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(inviteLink()); showToast("Invite link copied"); } catch { showToast("Couldn’t copy. Select the code instead."); }
+      });
+      $("#boost-use").addEventListener("click", () => {
+        if (settings.boosts <= 0) return;
+        settings.boosts--;
+        settings.boostUntil = Date.now() + 30 * 60000;
+        saveSettings();
+        renderInvite();
+        showToast("Boost on for 30 minutes 🚀");
+      });
+      $("#promo-apply").addEventListener("click", () => {
+        const input = $("#promo-input");
+        const code = input.value.trim().toUpperCase();
+        if (!code) return;
+        const promo = PROMOS[code];
+        if (!promo) return showToast("That code isn’t valid.");
+        if (settings.promos.includes(code)) return showToast("You already used that code.");
+        settings.promos = [...settings.promos, code];
+        grant(promo);
+        input.value = "";
+        pushNotification(`Promo ${code} applied: ${promo.label} 🎁`);
+        showToast(`Code applied: ${promo.label} 🎁`);
+      });
+      $("#invite-demo").addEventListener("click", () => {
+        settings.referrals++;
+        grant({ super: 1, boost: settings.referrals % 3 === 0 ? 1 : 0 });
+        pushNotification("A friend joined with your code: +1 Super Like 🎉");
+        showToast(settings.referrals % 3 === 0 ? "Friend joined! +1 Super Like and a Boost 🎉" : "Friend joined! +1 Super Like 🎉");
+      });
+      $("#invite-card").addEventListener("click", () => {
+        if (typeof qrcode !== "function") return showToast("QR generator unavailable.");
+        const qr = qrcode(0, "M");
+        qr.addData(inviteLink());
+        qr.make();
+        const canvas = document.createElement("canvas");
+        canvas.width = 600;
+        canvas.height = 800;
+        const g = canvas.getContext("2d");
+        const grad = g.createLinearGradient(0, 0, 600, 800);
+        grad.addColorStop(0, "#f27e7b");
+        grad.addColorStop(1, "#e75b6b");
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 600, 800);
+        g.fillStyle = "#fff";
+        g.font = "700 56px system-ui, sans-serif";
+        g.fillText("Instami", 50, 110);
+        g.font = "500 28px system-ui, sans-serif";
+        g.fillText("Meet your kind of people", 50, 158);
+        g.font = "700 40px system-ui, sans-serif";
+        g.fillText("Jordan, 29", 50, 250);
+        g.font = "400 26px system-ui, sans-serif";
+        g.fillText((settings.bio || "Here for something real").slice(0, 38), 50, 296);
+        const count = qr.getModuleCount();
+        const cell = Math.floor(320 / count);
+        const size = cell * count;
+        g.fillStyle = "#fff";
+        g.beginPath();
+        g.roundRect(130, 340, 340, 340, 24);
+        g.fill();
+        g.fillStyle = "#1b1513";
+        for (let r = 0; r < count; r++) for (let c = 0; c < count; c++) if (qr.isDark(r, c)) g.fillRect(130 + (340 - size) / 2 + c * cell, 340 + (340 - size) / 2 + r * cell, cell, cell);
+        g.fillStyle = "#fff";
+        g.textAlign = "center";
+        g.font = "700 34px system-ui, sans-serif";
+        g.fillText(`Code: ${settings.refCode}`, 300, 740);
+        canvas.toBlob((blob) => {
+          if (!blob) return showToast("Couldn’t create the card.");
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "instami-invite.png";
+          link.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+          showToast("Invite card saved 📸");
+        });
+      });
 
       // ===== Top picks & interests =====
       function renderPicks() {
