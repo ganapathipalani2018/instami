@@ -1,11 +1,1418 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Instamy</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fffaf7">
+  <meta name="description" content="Meet people who feel like your kind of people.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src https://images.unsplash.com blob:; media-src blob: https://interactive-examples.mdn.mozilla.net https://test-videos.co.uk https://samplelib.com https://download.samplelib.com; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Instami — Meet your kind of people</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #292522;
+      --muted: #8d8580;
+      --line: #eee8e3;
+      --paper: #fffaf7;
+      --white: #fff;
+      --rose: #ee6b72;
+      --rose-dark: #d8515b;
+      --peach: #fff0e9;
+      --green: #2f9b78;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--ink); background: #f3efec; }
+    button, input { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #ee6b7270; outline-offset: 3px; }
+    .app { position: relative; display: flex; width: min(100%, 520px); min-height: 100vh; min-height: 100svh; margin: 0 auto; flex-direction: column; overflow: hidden; background: var(--paper); box-shadow: 0 0 60px #362a2010; }
+    .topbar { display: flex; min-height: 72px; align-items: center; justify-content: space-between; padding: 14px 22px 10px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-size: 21px; font-weight: 820; letter-spacing: -1.2px; }
+    .brand-mark { display: grid; width: 31px; height: 31px; place-items: center; border-radius: 11px; color: #fff; background: linear-gradient(145deg,#fa8f88,#e45b6c); }
+    .brand-mark svg { width: 19px; height: 19px; }
+    .top-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-button { position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: #625a55; background: #fff; }
+    .icon-button svg { width: 19px; height: 19px; }
+    .notification-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border: 1px solid white; border-radius: 50%; background: var(--rose); }
+    .view { display: none; flex: 1; padding: 0 20px 105px; }
+    .view.active { display: block; }
+    .view-heading { display: flex; align-items: flex-end; justify-content: space-between; margin: 7px 1px 14px; }
+    .view-heading h1 { margin: 0; font-size: 25px; font-weight: 780; letter-spacing: -1px; }
+    .view-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .location-chip { display: inline-flex; align-items: center; gap: 5px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 20px; color: #6f655e; background: #fff; font-size: 10px; font-weight: 650; white-space: nowrap; }
+    .location-chip svg { width: 13px; height: 13px; color: var(--rose-dark); }
+    .prompt-strip { display: flex; align-items: center; gap: 10px; margin: 0 1px 14px; padding: 10px 12px; border: 1px solid #f6e5dc; border-radius: 13px; background: linear-gradient(100deg,#fff1e9,#fff8f4); }
+    .prompt-icon { display: grid; width: 31px; height: 31px; flex: none; place-items: center; border-radius: 10px; color: #d46e5c; background: #fff; }
+    .prompt-icon svg { width: 16px; height: 16px; }
+    .prompt-copy { flex: 1; font-size: 10px; line-height: 1.4; }
+    .prompt-copy strong { display: block; margin-bottom: 2px; font-size: 11px; }
+    .prompt-strip button { padding: 5px 0 5px 5px; border: 0; color: var(--rose-dark); background: none; font-size: 10px; font-weight: 750; white-space: nowrap; }
+    .discovery-card { position: relative; height: min(54vh, 500px); min-height: 355px; max-height: 500px; overflow: hidden; border-radius: 22px; background: #d8c8bc; box-shadow: 0 12px 30px #4c35251a; isolation: isolate; }
+    .profile-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+    .discovery-card::after { position: absolute; z-index: 0; inset: 22% 0 0; background: linear-gradient(180deg,transparent 0%,#1d1714a6 100%); content: ""; pointer-events: none; }
+    .photo-top { position: absolute; z-index: 1; top: 15px; right: 15px; left: 15px; display: flex; align-items: center; justify-content: space-between; }
+    .photo-label { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid #ffffff50; border-radius: 20px; color: #fff; background: #211b194c; backdrop-filter: blur(10px); font-size: 10px; font-weight: 650; }
+    .photo-label svg { width: 13px; height: 13px; }
+    .photo-menu { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid #ffffff55; border-radius: 50%; color: #fff; background: #211b194c; backdrop-filter: blur(8px); }
+    .photo-menu svg { width: 18px; height: 18px; }
+    .card-content { position: absolute; z-index: 1; right: 20px; bottom: 17px; left: 20px; color: white; }
+    .name-line { display: flex; align-items: center; gap: 8px; }
+    .name-line h2 { margin: 0; font-size: 29px; font-weight: 780; letter-spacing: -.8px; }
+    .verified { display: grid; width: 19px; height: 19px; place-items: center; border-radius: 50%; color: #fff; background: #61aaf3; }
+    .verified svg { width: 12px; height: 12px; }
+    .profile-meta { display: flex; align-items: center; gap: 7px; margin-top: 5px; color: #ffffffeb; font-size: 12px; }
+    .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: #ffffffb3; }
+    .bio { max-width: 360px; margin: 12px 0 11px; color: #ffffffef; font-size: 12px; line-height: 1.5; }
+    .interest-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .interest { padding: 6px 9px; border: 1px solid #ffffff56; border-radius: 20px; color: white; background: #ffffff1a; backdrop-filter: blur(6px); font-size: 10px; }
+    .card-progress { position: absolute; z-index: 2; top: 9px; right: 14px; left: 14px; display: flex; gap: 4px; }
+    .card-progress span { height: 2px; flex: 1; border-radius: 3px; background: #ffffff75; }
+    .card-progress span:first-child { background: white; }
+    .action-row { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 14px 0 4px; }
+    .action-button { display: grid; width: 54px; height: 54px; place-items: center; border: 1px solid #f0e9e3; border-radius: 50%; color: #786e67; background: white; box-shadow: 0 5px 15px #352a2210; transition: transform .18s, box-shadow .18s; }
+    .action-button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px #352a2220; }
+    .action-button svg { width: 23px; height: 23px; }
+    .action-button.pass { color: #ee7279; }
+    .action-button.like { width: 64px; height: 64px; border: 0; color: white; background: linear-gradient(145deg,#f78380,#e95869); box-shadow: 0 8px 19px #e85d6b40; }
+    .action-button.like svg { width: 27px; height: 27px; }
+    .action-button.boost { width: 45px; height: 45px; color: #7d68c9; }
+    .action-button.boost svg { width: 20px; height: 20px; }
+    .action-hint { margin: 4px 0 0; color: #a49b95; text-align: center; font-size: 10px; }
+    .bottom-nav { position: fixed; z-index: 5; right: 0; bottom: 0; left: 0; display: flex; width: min(100%, 520px); height: calc(76px + env(safe-area-inset-bottom)); align-items: flex-start; justify-content: space-around; margin: 0 auto; padding: 10px 11px env(safe-area-inset-bottom); border-top: 1px solid #eee8e3; background: #fffdfbF2; backdrop-filter: blur(18px); }
+    .nav-button { position: relative; display: flex; min-width: 58px; flex-direction: column; align-items: center; gap: 4px; padding: 3px 8px; border: 0; color: #a19892; background: none; font-size: 9px; font-weight: 620; }
+    .nav-button svg { width: 22px; height: 22px; }
+    .nav-button.active { color: var(--rose-dark); }
+    .nav-button.active::before { position: absolute; top: -11px; width: 23px; height: 2px; border-radius: 2px; background: var(--rose); content: ""; }
+    .nav-badge { position: absolute; top: 0; right: 7px; display: grid; min-width: 15px; height: 15px; place-items: center; padding: 0 4px; border: 2px solid white; border-radius: 10px; color: white; background: var(--rose); font-size: 8px; }
+    .section-title { margin: 20px 0 11px; font-size: 14px; font-weight: 750; letter-spacing: -.2px; }
+    .likes-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .like-card { position: relative; min-height: 220px; overflow: hidden; border-radius: 17px; background: #e8d8ce; }
+    .like-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .like-card::after { position: absolute; inset: 38% 0 0; background: linear-gradient(transparent,#201815b8); content: ""; }
+    .like-card-info { position: absolute; z-index: 1; right: 11px; bottom: 11px; left: 11px; color: white; }
+    .like-card-info strong { display: block; font-size: 15px; }
+    .like-card-info span { font-size: 10px; opacity: .9; }
+    .like-card button { position: absolute; z-index: 2; top: 9px; right: 9px; display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 50%; color: var(--rose-dark); background: white; }
+    .like-card button svg { width: 16px; height: 16px; }
+    .match-note { margin: 9px 0 14px; padding: 12px; border-radius: 13px; color: #755c51; background: #fff0e9; font-size: 11px; line-height: 1.5; }
+    .match-note strong { color: #44332b; }
+    .conversation-list { display: grid; gap: 2px; }
+    .conversation { display: flex; width: 100%; align-items: center; gap: 12px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; }
+    .conversation img { width: 52px; height: 52px; flex: none; border-radius: 50%; object-fit: cover; }
+    .conversation-copy { min-width: 0; flex: 1; }
+    .conversation-name { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 720; }
+    .conversation-time { color: #a49b95; font-size: 9px; font-weight: 500; }
+    .conversation-preview { overflow: hidden; margin-top: 5px; color: #938982; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .unread { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--rose); }
+    .profile-card { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 17px; background: white; }
+    .my-profile { display: flex; align-items: center; gap: 13px; }
+    .my-profile img { width: 66px; height: 66px; border-radius: 50%; object-fit: cover; }
+    .my-profile h2 { margin: 0 0 4px; font-size: 18px; letter-spacing: -.4px; }
+    .my-profile p { margin: 0; color: var(--muted); font-size: 11px; }
+    .profile-completion { margin-top: 16px; }
+    .completion-label { display: flex; justify-content: space-between; margin-bottom: 7px; color: #716761; font-size: 10px; font-weight: 650; }
+    .progress-track { height: 6px; overflow: hidden; border-radius: 6px; background: #f3eeea; }
+    .progress-track span { display: block; width: 78%; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#f78b83,#e75d6b); }
+    .setting-list { display: grid; margin-top: 15px; overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: white; }
+    .setting-row { display: flex; min-height: 52px; align-items: center; gap: 11px; padding: 0 14px; border: 0; border-bottom: 1px solid var(--line); background: white; text-align: left; font-size: 12px; font-weight: 600; }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-row svg { width: 17px; height: 17px; color: #8d817a; }
+    .setting-row span { flex: 1; }
+    .setting-row small { color: #a49b95; font-size: 10px; font-weight: 500; }
+    .safety-banner { margin-top: 16px; padding: 13px; border-radius: 14px; background: #f5f2ff; }
+    .safety-banner strong { font-size: 11px; }
+    .safety-banner p { margin: 5px 0 0; color: #7d718d; font-size: 10px; line-height: 1.5; }
+    .chat-view { position: absolute; z-index: 6; inset: 0; display: none; flex-direction: column; background: var(--paper); }
+    .chat-view.open { display: flex; }
+    .chat-header { display: flex; min-height: 66px; align-items: center; gap: 10px; padding: 10px 15px; border-bottom: 1px solid var(--line); background: white; }
+    .back-button { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border: 0; border-radius: 50%; background: #f7f3f0; }
+    .back-button svg { width: 17px; height: 17px; }
+    .chat-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .chat-heading { min-width: 0; flex: 1; }
+    .chat-heading strong { display: block; font-size: 13px; }
+    .chat-heading span { color: var(--green); font-size: 10px; }
+    .chat-header .icon-button { width: 35px; height: 35px; }
+    .chat-body { display: flex; flex: 1; flex-direction: column; gap: 10px; overflow-y: auto; padding: 18px 15px; }
+    .chat-date { margin: 2px 0 8px; color: #a49b95; text-align: center; font-size: 9px; }
+    .message { max-width: 78%; padding: 10px 12px; border-radius: 15px; font-size: 12px; line-height: 1.45; }
+    .message.them { align-self: flex-start; border-bottom-left-radius: 5px; background: white; }
+    .message.me { align-self: flex-end; border-bottom-right-radius: 5px; color: white; background: #e86b74; }
+    .chat-compose { display: flex; align-items: center; gap: 8px; padding: 10px 13px calc(13px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: white; }
+    .chat-compose input { min-width: 0; height: 42px; flex: 1; padding: 0 14px; border: 1px solid var(--line); border-radius: 22px; background: #fbf8f6; font-size: 12px; }
+    .send-button { display: grid; width: 40px; height: 40px; flex: none; place-items: center; border: 0; border-radius: 50%; color: white; background: var(--rose); }
+    .send-button svg { width: 17px; height: 17px; }
+    .backdrop { position: fixed; z-index: 10; inset: 0; display: none; align-items: flex-end; justify-content: center; padding: 16px; background: #20191770; }
+    .backdrop.open { display: flex; }
+    .sheet { width: min(100%, 480px); max-height: 88vh; overflow-y: auto; padding: 20px; border-radius: 22px 22px 18px 18px; background: var(--paper); box-shadow: 0 15px 50px #20191738; animation: rise .2s ease-out; }
+    @keyframes rise { from { transform: translateY(14px); opacity: .7; } to { transform: translateY(0); opacity: 1; } }
+    .sheet-handle { width: 36px; height: 4px; margin: -8px auto 16px; border-radius: 5px; background: #ded6d0; }
+    .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .sheet-head h2 { margin: 0; font-size: 20px; letter-spacing: -.6px; }
+    .sheet-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .close-button { display: grid; width: 32px; height: 32px; flex: none; place-items: center; border: 0; border-radius: 50%; background: #f2ede9; }
+    .close-button svg { width: 16px; height: 16px; }
+    .filter-group { margin-top: 21px; }
+    .filter-label { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: 700; }
+    .filter-label span:last-child { color: var(--rose-dark); }
+    .range { width: 100%; accent-color: var(--rose); }
+    .range-ends { display: flex; justify-content: space-between; margin-top: 4px; color: #aaa09a; font-size: 9px; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 17px; font-size: 12px; font-weight: 620; }
+    .toggle { position: relative; width: 42px; height: 24px; padding: 0; border: 0; border-radius: 20px; background: #ded8d2; transition: background .2s; }
+    .toggle::after { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px #0002; transition: transform .2s; content: ""; }
+    .toggle[aria-checked="true"] { background: var(--rose); }
+    .toggle[aria-checked="true"]::after { transform: translateX(18px); }
+    .primary-cta { width: 100%; min-height: 46px; margin-top: 22px; border: 0; border-radius: 13px; color: white; background: linear-gradient(100deg,#f27e7b,#e75b6b); font-size: 12px; font-weight: 750; box-shadow: 0 6px 15px #e85d6b36; }
+    .detail-photo { width: 100%; height: 245px; margin: 17px 0 12px; border-radius: 16px; object-fit: cover; }
+    .detail-bio { color: #716761; font-size: 12px; line-height: 1.65; }
+    .detail-actions { display: grid; gap: 8px; margin-top: 17px; }
+    .detail-actions button { min-height: 42px; border: 1px solid var(--line); border-radius: 11px; background: white; font-size: 11px; font-weight: 650; }
+    .detail-actions button.danger { color: #c94f57; }
+    .match-sheet { text-align: center; }
+    .match-spark { display: grid; width: 58px; height: 58px; margin: 3px auto 12px; place-items: center; border-radius: 21px; color: white; background: linear-gradient(145deg,#f88b82,#e55b70); box-shadow: 0 8px 20px #e85d6b45; transform: rotate(-6deg); }
+    .match-spark svg { width: 29px; height: 29px; }
+    .match-sheet h2 { margin: 0; font-size: 25px; letter-spacing: -1px; }
+    .match-sheet > p { margin: 7px 0 16px; color: var(--muted); font-size: 11px; }
+    .match-people { display: flex; align-items: center; justify-content: center; margin: 18px 0; }
+    .match-people img { width: 92px; height: 92px; border: 4px solid var(--paper); border-radius: 50%; object-fit: cover; }
+    .match-people img + img { margin-left: -17px; }
+    .match-people span { z-index: 1; display: grid; width: 30px; height: 30px; margin: 0 -7px; place-items: center; border: 3px solid var(--paper); border-radius: 50%; color: white; background: var(--rose); }
+    .match-people span svg { width: 13px; height: 13px; }
+    .secondary-cta { width: 100%; min-height: 43px; margin-top: 9px; border: 1px solid var(--line); border-radius: 12px; color: #6e625d; background: white; font-size: 11px; font-weight: 700; }
+    .toast { position: fixed; z-index: 20; right: 20px; bottom: calc(88px + env(safe-area-inset-bottom)); left: 20px; width: fit-content; max-width: calc(100% - 40px); margin: 0 auto; padding: 11px 15px; border-radius: 12px; color: white; background: #302925; box-shadow: 0 7px 20px #30292535; font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .empty-state { padding: 35px 20px; border: 1px dashed #e6ddd6; border-radius: 15px; color: var(--muted); text-align: center; font-size: 12px; line-height: 1.6; }
+    [hidden] { display: none !important; }
+    @media (min-width: 700px) {
+      .app { min-height: min(920px, 100vh); margin: 22px auto; border: 1px solid #eae3de; border-radius: 28px; }
+      .bottom-nav { bottom: 22px; border-right: 1px solid #eae3de; border-bottom: 1px solid #eae3de; border-left: 1px solid #eae3de; border-radius: 0 0 28px 28px; }
+      .backdrop { align-items: center; }
+      .sheet { border-radius: 22px; }
+    }
+    @media (max-height: 720px) and (max-width: 699px) {
+      .discovery-card { height: 48vh; min-height: 320px; }
+      .topbar { min-height: 62px; }
+      .view-heading { margin-top: 2px; }
+    }
+    .discovery-card { touch-action: pan-y; user-select: none; }
+    .discovery-card[data-swipe="like"] { outline: 4px solid #5bd69a99; }
+    .discovery-card[data-swipe="pass"] { outline: 4px solid #ee6b7299; }
+    .compat { margin-left: auto; padding: 4px 8px; border-radius: 20px; color: #fff; background: #2f9b78cc; font-size: 10px; font-weight: 750; }
+    .blur-photos .profile-photo, .blur-photos .like-card img { filter: blur(18px); transform: scale(1.1); }
+    .shorts-view.view { padding: 0; }
+    .shorts-wrap { position: relative; }
+    .shorts-feed { height: calc(100svh - 148px); min-height: 360px; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; background: #000; overscroll-behavior: contain; }
+    .shorts-feed::-webkit-scrollbar { display: none; }
+    .short { position: relative; height: 100%; overflow: hidden; scroll-snap-align: start; scroll-snap-stop: always; background: #1c1613; color: #fff; }
+    .short video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #1c1613; }
+    .short::after { position: absolute; inset: 42% 0 0; background: linear-gradient(transparent,#000b); content: ""; pointer-events: none; }
+    .short.paused::before { position: absolute; z-index: 2; top: 50%; left: 50%; display: grid; width: 62px; height: 62px; place-items: center; border-radius: 50%; background: #0007; content: "▶"; font-size: 24px; transform: translate(-50%,-50%); pointer-events: none; }
+    .short-info { position: absolute; z-index: 3; bottom: 22px; left: 16px; right: 80px; }
+    .short-author { display: flex; align-items: center; gap: 9px; }
+    .short-author img { width: 38px; height: 38px; border: 2px solid #fff; border-radius: 50%; object-fit: cover; }
+    .short-author strong { font-size: 13px; }
+    .follow-btn { padding: 5px 11px; border: 1px solid #fff9; border-radius: 20px; color: #fff; background: #ffffff1f; font-size: 10px; font-weight: 700; }
+    .follow-btn.on { border-color: transparent; background: var(--rose); }
+    .short-caption { margin: 9px 0 6px; font-size: 12px; line-height: 1.45; text-shadow: 0 1px 4px #0008; }
+    .short-tags { color: #ffd4cf; font-size: 11px; font-weight: 650; }
+    .short-music { margin-top: 8px; font-size: 10px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .short-rail { position: absolute; z-index: 4; right: 9px; bottom: 22px; display: grid; gap: 13px; justify-items: center; }
+    .rail-btn { display: grid; justify-items: center; gap: 3px; padding: 0; border: 0; color: #fff; background: none; font-size: 10px; font-weight: 700; text-shadow: 0 1px 4px #0009; }
+    .rail-btn .rail-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: #00000055; backdrop-filter: blur(6px); }
+    .rail-btn svg { width: 23px; height: 23px; }
+    .rail-btn.on .rail-icon { color: var(--rose); }
+    .rail-btn.match .rail-icon { background: linear-gradient(145deg,#f78380,#e95869); }
+    .short-progress { position: absolute; z-index: 4; right: 0; bottom: 0; left: 0; height: 3px; background: #ffffff33; }
+    .short-progress span { display: block; width: 0; height: 100%; background: #fff; }
+    .heart-burst { position: absolute; z-index: 5; top: 50%; left: 50%; width: 96px; height: 96px; color: var(--rose); opacity: 0; pointer-events: none; transform: translate(-50%,-50%) scale(.4); }
+    .heart-burst.go { animation: burst .7s ease-out; }
+    .heart-burst svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 12px #0006); }
+    @keyframes burst { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.4); } 25% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); } 100% { opacity: 0; transform: translate(-50%,-70%) scale(1); } }
+    .shorts-tabs { position: absolute; z-index: 6; top: 10px; left: 50%; display: flex; gap: 4px; padding: 3px; border-radius: 20px; background: #0006; backdrop-filter: blur(8px); transform: translateX(-50%); }
+    .shorts-tabs button { padding: 6px 11px; border: 0; border-radius: 17px; color: #ffffffc0; background: none; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .shorts-tabs button.active { color: #2b2320; background: #fff; }
+    .short-fab { position: absolute; z-index: 6; top: 10px; display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 50%; color: #fff; background: #0006; backdrop-filter: blur(8px); font-size: 16px; }
+    .short-fab svg { width: 19px; height: 19px; }
+    #short-create { left: 12px; background: linear-gradient(145deg,#f78380,#e95869); }
+    #short-mute { right: 12px; }
+    .short-empty { display: grid; height: 100%; place-items: center; padding: 30px; color: #ffffffb0; text-align: center; font-size: 12px; line-height: 1.7; }
+    .stack { display: grid; gap: 10px; }
+    .sec-score { margin-top: 16px; padding: 14px; border-radius: 15px; background: #f1faf6; }
+    .sec-score-top { display: flex; align-items: baseline; justify-content: space-between; font-size: 12px; font-weight: 700; }
+    .sec-score-top b { color: var(--green); font-size: 22px; }
+    .sec-score .progress-track span { width: 0; background: linear-gradient(90deg,#5bd69a,#2f9b78); transition: width .4s; }
+    .sec-item { display: flex; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .sec-item:last-child { border-bottom: 0; }
+    .sec-item > svg { width: 20px; height: 20px; flex: none; color: var(--rose-dark); }
+    .sec-item .sec-copy { flex: 1; min-width: 0; font-size: 12px; font-weight: 650; }
+    .sec-item .sec-copy small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 500; line-height: 1.45; }
+    .mini-btn { padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: #fff; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .mini-btn.primary { border-color: transparent; color: #fff; background: var(--rose); }
+    .mini-btn.good { border-color: transparent; color: #1c7a5b; background: #def5ec; }
+    .sec-heading { margin: 21px 0 2px; color: #a0968f; font-size: 10px; font-weight: 750; letter-spacing: 1px; text-transform: uppercase; }
+    .text-input { width: 100%; height: 42px; padding: 0 13px; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: #fff; font-size: 12px; }
+    .input-row { display: flex; gap: 8px; margin-top: 9px; }
+    .e2ee { display: block; margin-top: 2px; color: var(--green); font-size: 9px; }
+    .risk-banner { display: flex; align-items: flex-start; gap: 8px; margin: 0 13px 8px; padding: 10px 12px; border-radius: 12px; color: #8a4b12; background: #fff3dc; font-size: 10px; line-height: 1.5; }
+    .risk-banner button { margin-left: auto; padding: 0; border: 0; color: inherit; background: none; font-size: 14px; }
+    .icebreakers { display: flex; gap: 7px; padding: 0 13px 8px; overflow-x: auto; scrollbar-width: none; }
+    .icebreakers button { padding: 7px 11px; border: 1px solid #f3d9d2; border-radius: 17px; background: #fff4f0; color: #a6483f; font-size: 10px; font-weight: 650; white-space: nowrap; }
+    .message audio { display: block; max-width: 210px; height: 34px; }
+    .message.typing { color: var(--muted); }
+    .voice-button { display: grid; width: 40px; height: 40px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff; font-size: 16px; }
+    .voice-button.recording { color: #fff; background: #d33b4a; animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 7px #d33b4a30; } }
+    .cam-box { position: relative; margin-top: 16px; overflow: hidden; border-radius: 16px; background: #000; aspect-ratio: 3 / 4; max-height: 52vh; }
+    .cam-box video { width: 100%; height: 100%; object-fit: cover; }
+    .cam-box.mirror video { transform: scaleX(-1); }
+    .cam-badge { position: absolute; top: 10px; left: 10px; padding: 5px 9px; border-radius: 16px; color: #fff; background: #000a; font-size: 10px; font-weight: 700; }
+    .rec-button { display: grid; width: 62px; height: 62px; margin: 14px auto 0; place-items: center; border: 4px solid #e95869; border-radius: 50%; background: #fff; }
+    .rec-button::after { width: 36px; height: 36px; border-radius: 50%; background: #e95869; content: ""; transition: all .2s; }
+    .rec-button.on::after { width: 24px; height: 24px; border-radius: 6px; }
+    .gesture { margin-top: 12px; padding: 12px; border-radius: 12px; background: #fff0e9; text-align: center; font-size: 13px; font-weight: 750; }
+    .comment-list { display: grid; gap: 12px; max-height: 42vh; margin-top: 15px; overflow-y: auto; }
+    .comment b { font-size: 11px; }
+    .comment p { margin: 3px 0 0; color: #5f5650; font-size: 12px; line-height: 1.45; }
+    .lock-screen { position: fixed; z-index: 50; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 30px; color: #fff; background: linear-gradient(160deg,#2b1c20,#161012); text-align: center; }
+    .lock-screen.open { display: flex; }
+    .lock-screen .match-spark { margin-bottom: 4px; }
+    .lock-screen input { width: 190px; height: 48px; border: 1px solid #ffffff30; border-radius: 13px; color: #fff; background: #ffffff12; text-align: center; font-size: 22px; letter-spacing: 8px; }
+    .lock-screen p { margin: 0; color: #ffffffa8; font-size: 11px; min-height: 16px; }
+    html[data-theme="dark"] { color-scheme: dark; --paper: #171210; --ink: #f3ece8; --line: #342a28; --muted: #aa9e97; }
+    html[data-theme="dark"] body { background: #0b0807; }
+    html[data-theme="dark"] .icon-button, html[data-theme="dark"] .location-chip, html[data-theme="dark"] .action-button, html[data-theme="dark"] .profile-card, html[data-theme="dark"] .setting-list, html[data-theme="dark"] .setting-row, html[data-theme="dark"] .chat-header, html[data-theme="dark"] .chat-compose, html[data-theme="dark"] .message.them, html[data-theme="dark"] .secondary-cta, html[data-theme="dark"] .detail-actions button, html[data-theme="dark"] .mini-btn, html[data-theme="dark"] .text-input, html[data-theme="dark"] .voice-button { color: #efe6e1; background: #241c1a; border-color: #382d2a; }
+    html[data-theme="dark"] .bottom-nav { background: #171210f2; border-color: #2e2523; }
+    html[data-theme="dark"] .back-button, html[data-theme="dark"] .close-button { color: #efe6e1; background: #2c2220; }
+    html[data-theme="dark"] .chat-compose input { color: #efe6e1; background: #1c1513; border-color: #382d2a; }
+    html[data-theme="dark"] .prompt-strip, html[data-theme="dark"] .match-note, html[data-theme="dark"] .gesture { color: #e7cfc6; background: #2b1f1c; border-color: #3a2b27; }
+    html[data-theme="dark"] .sec-score { background: #15251f; }
+    html[data-theme="dark"] .safety-banner { background: #211c30; }
+    html[data-theme="dark"] .comment p, html[data-theme="dark"] .detail-bio { color: #cdbfb8; }
+    html[data-theme="dark"] .interest.light { color: #e0cdc4; background: #241c1a; border-color: #3a2f2b; }
+    html[data-theme="dark"] .icebreakers button { color: #f3bdb5; background: #2e1f1d; border-color: #43302c; }
+    .interest.light { border-color: #f0e5df; color: #77645a; background: #fff; }
+    @media (min-width: 700px) { .shorts-feed { height: calc(min(920px, 100vh) - 150px); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Instamy</h1>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-2 2v-9.5A7.5 7.5 0 0 1 10.5 4h2A7.5 7.5 0 0 1 20 11.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10m-7 5h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="7" r="2" fill="var(--paper)" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="12" r="2" fill="var(--paper)" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Zm7 12 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2 11 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-heart-fill" viewBox="0 0 24 24"><path d="M20.8 8.7c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10a4.7 4.7 0 0 1 8.8-2.2 4.7 4.7 0 0 1 8.8 2.2Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4m4-4v13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bookmark-fill" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4Z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m10 9 5 3-5 3Z" fill="currentColor"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m11 12 9-9m-3 3 3 3m-6-0 2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark"><svg><use href="#i-heart"/></svg></span>instami</div>
+      <div class="top-actions">
+        <button class="icon-button" id="notifications-button" type="button" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span class="notification-dot"></span></button>
+        <button class="icon-button" id="security-button" type="button" aria-label="Security center"><svg><use href="#i-shield"/></svg></button>
+        <button class="icon-button" id="filter-button" type="button" aria-label="Discovery filters"><svg><use href="#i-filter"/></svg></button>
+      </div>
+    </header>
+
+    <section class="view active" id="discover-view" aria-label="Discover people">
+      <div class="view-heading">
+        <div><h1>Find your person.</h1><p>Good connections start with being you.</p></div>
+        <span class="location-chip"><svg><use href="#i-pin"/></svg><span id="location-text">Brooklyn, NY</span></span>
+      </div>
+      <div class="prompt-strip">
+        <span class="prompt-icon"><svg><use href="#i-spark"/></svg></span>
+        <div class="prompt-copy"><strong>More than a first impression</strong>See what Alex is into and start with a real conversation.</div>
+        <button type="button" id="prompt-button">Say hi <span aria-hidden="true">→</span></button>
+      </div>
+      <article class="discovery-card" id="discovery-card">
+        <img class="profile-photo" id="profile-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85" alt="Alex, smiling outdoors">
+        <div class="card-progress" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="photo-top">
+          <span class="photo-label"><span style="width:7px;height:7px;border-radius:50%;background:#79d6a5"></span>Active today</span>
+          <button class="photo-menu" id="profile-more" type="button" aria-label="More profile options"><svg><use href="#i-more"/></svg></button>
+        </div>
+        <div class="card-content">
+          <div class="name-line"><h2 id="profile-name">Alex, 28</h2><span class="verified" aria-label="Verified profile">          <svg><use href="#i-check"/></svg></span><span class="compat" id="profile-compat"></span></div>
+          <div class="profile-meta"><span id="profile-job">Designer</span><span class="meta-dot"></span><span id="profile-distance">2 miles away</span></div>
+          <p class="bio" id="profile-bio">Collecting little moments, big playlists, and places with really good dumplings.</p>
+          <div class="interest-list" id="profile-interests"><span class="interest">Live music</span><span class="interest">Good food</span><span class="interest">Weekend trips</span></div>
+        </div>
+      </article>
+      <div class="action-row" aria-label="Profile actions">
+        <button class="action-button pass" id="pass-button" type="button" aria-label="Pass"><svg><use href="#i-close"/></svg></button>
+        <button class="action-button boost" id="boost-button" type="button" aria-label="Send a spark"><svg><use href="#i-bolt"/></svg></button>
+        <button class="action-button like" id="like-button" type="button" aria-label="Like"><svg><use href="#i-heart"/></svg></button>
+      </div>
+      <p class="action-hint">A little kindness goes a long way.</p>
+    </section>
+
+    <section class="view shorts-view" id="shorts-view" aria-label="Shorts">
+      <div class="shorts-wrap">
+        <div class="shorts-tabs" role="tablist" aria-label="Shorts feed"><button class="active" type="button" data-feed="foryou">For you</button><button type="button" data-feed="nearby">Nearby</button><button type="button" data-feed="following">Following</button></div>
+        <button class="short-fab" id="short-create" type="button" aria-label="Create a short"><svg><use href="#i-plus"/></svg></button>
+        <button class="short-fab" id="short-mute" type="button" aria-label="Unmute videos">🔇</button>
+        <div class="shorts-feed" id="shorts-feed" tabindex="0" aria-label="Short videos"></div>
+      </div>
+    </section>
+
+    <section class="view" id="likes-view" aria-label="People who like you">
+      <div class="view-heading"><div><h1>Your admirers.</h1><p>Good things happen when you say hello.</p></div></div>
+      <div class="match-note"><strong>✨ A little nudge:</strong> Like someone back to make a match and start chatting. Your likes stay private until you match.</div>
+      <div class="likes-grid" id="likes-grid"></div>
+    </section>
+
+    <section class="view" id="messages-view" aria-label="Your conversations">
+      <div class="view-heading"><div><h1>Conversations.</h1><p>Your next favorite story might start here.</p></div></div>
+      <h2 class="section-title">Your matches</h2>
+      <div class="conversation-list" id="conversation-list"></div>
+    </section>
+
+    <section class="view" id="profile-view" aria-label="Your profile and settings">
+      <div class="view-heading"><div><h1>Your space.</h1><p>Show them what makes you, you.</p></div></div>
+      <div class="profile-card">
+        <div class="my-profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Your profile photo"><div><h2>Jordan, 29 <span id="my-verified" title="Verified" hidden>✅</span></h2><p>Brooklyn · here for something real</p></div></div>
+        <div class="profile-completion"><div class="completion-label"><span>Your profile is looking good</span><span>78%</span></div><div class="progress-track"><span></span></div></div>
+      </div>
+      <h2 class="section-title">Your settings</h2>
+      <div class="setting-list">
+        <button class="setting-row" type="button" data-action="edit"><svg><use href="#i-user"/></svg><span>Edit my profile</span><small>78% complete</small></button>
+        <button class="setting-row" type="button" id="profile-filters"><svg><use href="#i-filter"/></svg><span>Discovery preferences</span><small>Age, distance</small></button>
+        <button class="setting-row" type="button" data-action="privacy"><svg><use href="#i-shield"/></svg><span>Security center</span><small id="profile-sec-score">Review</small></button>
+      </div>
+      <div class="safety-banner"><strong>Feel safe being yourself.</strong><p>Verified profiles, easy-to-use controls, and a real team ready to help. Your comfort always comes first.</p></div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-button active" type="button" data-view="discover" aria-current="page"><svg><use href="#i-home"/></svg><span>Discover</span></button>
+      <button class="nav-button" type="button" data-view="shorts"><svg><use href="#i-play"/></svg><span>Shorts</span></button>
+      <button class="nav-button" type="button" data-view="likes"><svg><use href="#i-heart"/></svg><span>Likes</span><span class="nav-badge" id="likes-badge">3</span></button>
+      <button class="nav-button" type="button" data-view="messages"><svg><use href="#i-chat"/></svg><span>Chats</span><span class="nav-badge" id="chat-badge" hidden>1</span></button>
+      <button class="nav-button" type="button" data-view="profile"><svg><use href="#i-user"/></svg><span>Profile</span></button>
+    </nav>
+
+    <section class="chat-view" id="chat-view" aria-label="Chat with Alex">
+      <header class="chat-header">
+        <button class="back-button" id="chat-back" type="button" aria-label="Back to conversations"><svg><use href="#i-arrow" style="transform:rotate(180deg);transform-origin:center"/></svg></button>
+        <img id="chat-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="">
+        <div class="chat-heading"><strong id="chat-name">Alex</strong><span>● Active now</span><span class="e2ee" id="e2ee-badge"></span></div>
+        <button class="icon-button" id="video-button" type="button" aria-label="Start a video date"><svg><use href="#i-chat"/></svg></button>
+      </header>
+      <div class="chat-body" id="chat-body"></div>
+            <div class="risk-banner" id="risk-banner" role="alert" hidden><span>🛡️</span><span id="risk-text"></span><button type="button" id="risk-dismiss" aria-label="Dismiss warning">×</button></div>
+            <div class="icebreakers" id="icebreakers" aria-label="AI conversation starters"></div>
+            <form class="chat-compose" id="chat-form"><button class="voice-button" id="voice-button" type="button" aria-label="Record a voice note">🎙️</button><input id="chat-input" type="text" maxlength="300" placeholder="Write a thoughtful message…" autocomplete="off" aria-label="Write a message"><button class="send-button" type="submit" aria-label="Send message"><svg><use href="#i-send"/></svg></button></form>
+    </section>
+  </main>
+
+  <div class="backdrop" id="filters-modal" role="dialog" aria-modal="true" aria-labelledby="filters-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="filters-title">Your kind of people.</h2><p>Set the pace for who you meet.</p></div><button class="close-button" data-close type="button" aria-label="Close filters"><svg><use href="#i-close"/></svg></button></div>
+      <div class="filter-group"><div class="filter-label"><span>Age range</span><span id="age-value">25 – 34</span></div><input class="range" id="age-range" type="range" min="18" max="60" value="34" aria-label="Maximum age"><div class="range-ends"><span>18 years</span><span>60 years</span></div></div>
+      <div class="filter-group"><div class="filter-label"><span>Maximum distance</span><span id="distance-value">25 miles</span></div><input class="range" id="distance-range" type="range" min="1" max="100" value="25" aria-label="Maximum distance"><div class="range-ends"><span>1 mile</span><span>100 miles</span></div></div>
+      <div class="toggle-row"><span>Verified profiles only</span><button class="toggle" type="button" role="switch" aria-checked="false" aria-label="Verified profiles only"></button></div>
+      <div class="toggle-row"><span>Show me to new people</span><button class="toggle" type="button" role="switch" aria-checked="true" aria-label="Show me to new people"></button></div>
+      <button class="primary-cta" id="apply-filters" type="button">Show me my matches</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="detail-title">A little more about Alex</h2><p>Verified profile · Active today</p></div><button class="close-button" data-close type="button" aria-label="Close profile"><svg><use href="#i-close"/></svg></button></div>
+      <img class="detail-photo" id="detail-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85" alt="Alex">
+      <p class="detail-bio" id="detail-bio">Collecting little moments, big playlists, and places with really good dumplings. Looking for a genuine connection and someone who will split the last crispy one.</p>
+      <div class="interest-list" id="detail-interests"></div>
+      <div class="detail-actions"><button type="button" id="detail-like">Send a like 💛</button><button class="danger" type="button" id="report-button">Report or block</button></div>
+    </section>
+  </div>
+
+  <div class="backdrop" id="match-modal" role="dialog" aria-modal="true" aria-labelledby="match-title">
+    <section class="sheet match-sheet">
+      <div class="sheet-handle"></div>
+      <div class="match-spark"><svg><use href="#i-heart"/></svg></div>
+      <h2 id="match-title">It’s a match!</h2>
+      <p>You and <span id="match-person">Alex</span> like each other. That’s a pretty great start.</p>
+      <div class="match-people"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=220&q=85" alt="You"><span><svg><use href="#i-heart"/></svg></span><img id="match-photo" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=220&q=85" alt="Your new match"></div>
+      <button class="primary-cta" id="send-message-button" type="button">Start a conversation</button>
+      <button class="secondary-cta" data-close type="button">Keep discovering</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="security-modal" role="dialog" aria-modal="true" aria-labelledby="security-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="security-title">Security center</h2><p>You’re in control of your data and your safety.</p></div><button class="close-button" data-close type="button" aria-label="Close security center"><svg><use href="#i-close"/></svg></button></div>
+      <div class="sec-score"><div class="sec-score-top"><span>Your security score</span><b id="sec-score">0</b></div><div class="progress-track" style="margin-top:9px"><span id="sec-score-bar"></span></div></div>
+
+      <p class="sec-heading">Sign-in &amp; access</p>
+      <div class="sec-item"><svg><use href="#i-key"/></svg><div class="sec-copy">Passkey<small id="passkey-status">Phishing-resistant sign-in with Face ID, fingerprint or device PIN (WebAuthn).</small></div><button class="mini-btn primary" id="passkey-btn" type="button">Create</button></div>
+      <div class="sec-item"><svg><use href="#i-lock"/></svg><div class="sec-copy">App lock PIN<small id="pin-status">Salted PBKDF2 hash. Locks after 2 minutes idle or when you leave the tab.</small><div class="input-row"><input class="text-input" id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" minlength="4" maxlength="8" autocomplete="off" placeholder="4–8 digit PIN" aria-label="New PIN"><button class="mini-btn primary" id="pin-set" type="button">Set</button></div></div><button class="mini-btn" id="pin-remove" type="button" hidden>Remove</button></div>
+      <div class="sec-item"><svg><use href="#i-shield"/></svg><div class="sec-copy">Lock now<small>Instantly hides everything behind your PIN.</small></div><button class="mini-btn" id="lock-now" type="button">Lock</button></div>
+      <div class="sec-item"><svg><use href="#i-check"/></svg><div class="sec-copy">Auto-lock<small>Lock when idle or when the app is in the background.</small></div><button class="toggle" type="button" role="switch" data-setting="autoLock" aria-label="Auto-lock"></button></div>
+
+      <p class="sec-heading">Trust &amp; verification</p>
+      <div class="sec-item"><svg><use href="#i-camera"/></svg><div class="sec-copy">Live photo check<small id="verify-status">Strike a random pose on camera. The frame is never saved or uploaded. Demo check only: real face matching needs a server.</small></div><button class="mini-btn primary" id="verify-btn" type="button">Start</button></div>
+      <div class="sec-item"><svg><use href="#i-lock"/></svg><div class="sec-copy">End-to-end encrypted chats<small id="e2ee-status">ECDH P-256 key exchange + AES-256-GCM, with a safety number to compare.</small></div><span class="mini-btn good" id="e2ee-pill">Always on</span></div>
+      <div class="sec-item"><svg><use href="#i-shield"/></svg><div class="sec-copy">Scam &amp; oversharing shield<small>Warns about money requests, off-app links and personal info. Links are never clickable in chat.</small></div><span class="mini-btn good">Always on</span></div>
+
+      <p class="sec-heading">Privacy</p>
+      <div class="sec-item"><svg><use href="#i-eye"/></svg><div class="sec-copy">Incognito mode<small>Browse without appearing in others’ discovery.</small></div><button class="toggle" type="button" role="switch" data-setting="incognito" aria-label="Incognito mode"></button></div>
+      <div class="sec-item"><svg><use href="#i-pin"/></svg><div class="sec-copy">Hide my distance<small>Distances to others are hidden too.</small></div><button class="toggle" type="button" role="switch" data-setting="hideDistance" aria-label="Hide distance"></button></div>
+      <div class="sec-item"><svg><use href="#i-eye"/></svg><div class="sec-copy">Blur photos on screen<small>Great for public places. Tap off to reveal.</small></div><button class="toggle" type="button" role="switch" data-setting="blurPhotos" aria-label="Blur photos"></button></div>
+      <div class="sec-item"><svg><use href="#i-chat"/></svg><div class="sec-copy">Hide message previews<small>Shows “Encrypted message” in the chat list.</small></div><button class="toggle" type="button" role="switch" data-setting="hidePreviews" aria-label="Hide message previews"></button></div>
+      <div class="sec-item"><svg><use href="#i-spark"/></svg><div class="sec-copy">Dark mode<small>Easier on the eyes at night.</small></div><button class="toggle" type="button" role="switch" data-setting="dark" aria-label="Dark mode"></button></div>
+
+      <p class="sec-heading">Date safety</p>
+      <div class="sec-copy" style="padding:12px 0 0;font-size:12px;font-weight:650">Share a date check-in<small style="display:block;margin-top:3px;color:var(--muted);font-size:10px;font-weight:500">Send a trusted friend who, where and when.</small></div>
+      <div class="input-row"><input class="text-input" id="checkin-place" type="text" maxlength="80" placeholder="Where are you meeting?" aria-label="Meeting place"><button class="mini-btn primary" id="checkin-share" type="button">Share</button></div>
+
+      <p class="sec-heading">Your data</p>
+      <div class="sec-item"><svg><use href="#i-shield"/></svg><div class="sec-copy">Blocked people<small id="blocked-list">No one blocked.</small></div></div>
+      <div class="sec-item"><svg><use href="#i-download"/></svg><div class="sec-copy">Export my data<small>Download a JSON copy of what’s stored on this device.</small></div><button class="mini-btn" id="export-btn" type="button">Export</button></div>
+      <div class="sec-item"><svg><use href="#i-close"/></svg><div class="sec-copy">Delete local data<small>Erase settings, PIN and blocks, then restart.</small></div><button class="mini-btn" id="wipe-btn" type="button" style="color:#c94f57">Delete</button></div>
+      <div class="safety-banner"><strong>Good to know</strong><p>This prototype keeps everything on your device. A production app would add a server for accounts, real face verification and moderation, while keeping chat keys on-device.</p></div>
+    </section>
+  </div>
+
+  <div class="backdrop" id="create-modal" role="dialog" aria-modal="true" aria-labelledby="create-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="create-title">Create a short</h2><p>Record up to 30 seconds. It stays on this device.</p></div><button class="close-button" data-close type="button" aria-label="Close recorder"><svg><use href="#i-close"/></svg></button></div>
+      <div class="cam-box mirror" id="cam-box"><video id="cam-preview" playsinline muted></video><span class="cam-badge" id="cam-timer">Camera ready</span></div>
+      <button class="rec-button" id="rec-button" type="button" aria-label="Start recording"></button>
+      <div class="input-row"><input class="text-input" id="short-caption-input" type="text" maxlength="120" placeholder="Add a caption… #hashtags" aria-label="Caption"></div>
+      <div class="input-row"><label class="mini-btn" style="flex:1;text-align:center;cursor:pointer">Upload a video<input id="short-file" type="file" accept="video/*" hidden></label><button class="mini-btn primary" id="short-post" type="button" style="flex:1" disabled>Post short</button></div>
+    </section>
+  </div>
+
+  <div class="backdrop" id="verify-modal" role="dialog" aria-modal="true" aria-labelledby="verify-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="verify-title">Live photo check</h2><p>Hold the pose, then capture. Nothing is stored.</p></div><button class="close-button" data-close type="button" aria-label="Close verification"><svg><use href="#i-close"/></svg></button></div>
+      <div class="gesture" id="verify-gesture">✌️ Peace sign</div>
+      <div class="cam-box mirror"><video id="verify-video" playsinline muted></video></div>
+      <button class="primary-cta" id="verify-capture" type="button">Capture &amp; verify</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="comments-modal" role="dialog" aria-modal="true" aria-labelledby="comments-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="comments-title">Comments</h2><p id="comments-sub">Be kind. Be curious.</p></div><button class="close-button" data-close type="button" aria-label="Close comments"><svg><use href="#i-close"/></svg></button></div>
+      <div class="comment-list" id="comments-list"></div>
+      <form class="input-row" id="comment-form"><input class="text-input" id="comment-input" type="text" maxlength="200" placeholder="Add a comment…" autocomplete="off" aria-label="Add a comment"><button class="mini-btn primary" type="submit">Post</button></form>
+    </section>
+  </div>
+
+  <div class="lock-screen" id="lock-screen" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+    <div class="match-spark"><svg><use href="#i-lock"/></svg></div>
+    <h2 id="lock-title" style="margin:0;font-size:22px">Instami is locked</h2>
+    <form id="lock-form" style="display:grid;gap:10px;justify-items:center"><input id="lock-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" aria-label="Enter your PIN"><button class="mini-btn primary" type="submit" style="width:190px;padding:12px">Unlock</button></form>
+    <p id="lock-msg" role="status"></p>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (() => {
+      const profiles = [
+        { name: "Alex", age: 28, job: "Designer", distance: "2 miles away", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=85", bio: "Collecting little moments, big playlists, and places with really good dumplings.", interests: ["Live music", "Good food", "Weekend trips"], opener: "Hey! Your dumpling spot rec caught my eye 😄", preview: "Anything with chili crisp. Always chili crisp." },
+        { name: "Sam", age: 30, job: "Climate researcher", distance: "4 miles away", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=85", bio: "Usually outside, trying a new recipe, or telling my dog she’s a very good girl.", interests: ["Hiking", "Cooking", "Dogs"], opener: "Hi! I need your best easy weeknight recipe.", preview: "I’ll send you my favorite recipe!" },
+        { name: "Maya", age: 27, job: "Photographer", distance: "3 miles away", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1000&q=85", bio: "Chasing golden hour and the perfect taco. Here for thoughtful chats and spontaneous plans.", interests: ["Photography", "Tacos", "Art"], opener: "Okay, what’s the best taco spot around here?", preview: "That sounds like a perfect Saturday." },
+        { name: "Jamie", age: 29, job: "Ceramic artist", distance: "6 miles away", photo: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=85", bio: "Making wonky mugs, finding tiny bookstores, and learning how to make fresh pasta.", interests: ["Art", "Bookshops", "Pasta"], opener: "Important question: what's your favorite tiny bookstore?", preview: "I’m saving that one for this weekend." },
+        { name: "Riley", age: 31, job: "Product manager", distance: "5 miles away", photo: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=1000&q=85", bio: "A good museum date, a bad pun, and a very long walk are my kind of plans.", interests: ["Museums", "Puns", "Long walks"], opener: "I have a museum date idea and a truly bad pun.", preview: "I'll bring my most impressive pun." }
+      ];
+      const initialLikes = [
+        { name: "Taylor", age: 27, distance: "1 mile away", photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=500&q=80" },
+        { name: "Morgan", age: 30, distance: "3 miles away", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" },
+        { name: "Casey", age: 26, distance: "4 miles away", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80" }
+      ];
+      const matches = [];
+      let profileIndex = 0;
+      let activeMatch = profiles[0];
+      let latestMatched = profiles[0];
+      let toastTimer;
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const viewIds = ["discover", "shorts", "likes", "messages", "profile"];
+      const safeImage = (image, alt) => `<img src="${image}" alt="${alt}" loading="lazy">`;
+
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function setView(name) {
+        viewIds.forEach((view) => {
+          $(`#${view}-view`).classList.toggle("active", view === name);
+        });
+        document.querySelectorAll(".nav-button").forEach((button) => {
+          const selected = button.dataset.view === name;
+          button.classList.toggle("active", selected);
+          if (selected) button.setAttribute("aria-current", "page");
+          else button.removeAttribute("aria-current");
+        });
+        $("#chat-view").classList.remove("open");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        playVisible();
+      }
+
+      function renderProfile() {
+        for (let i = 0; i < profiles.length && settings.blocked.includes(profiles[profileIndex % profiles.length].name); i++) profileIndex++;
+        const profile = profiles[profileIndex % profiles.length];
+        activeMatch = profile;
+        $("#profile-photo").src = profile.photo;
+        $("#profile-photo").alt = `${profile.name}, smiling outdoors`;
+        $("#profile-name").textContent = `${profile.name}, ${profile.age}`;
+        $("#profile-job").textContent = profile.job;
+        $("#profile-distance").textContent = settings.hideDistance ? "Distance hidden" : profile.distance;
+        $("#profile-compat").textContent = `${compat(profile)}% match`;
+        $("#profile-bio").textContent = profile.bio;
+        $("#profile-interests").innerHTML = profile.interests.map((interest) => `<span class="interest">${esc(interest)}</span>`).join("");
+        $("#detail-title").textContent = `A little more about ${profile.name}`;
+        $("#detail-photo").src = profile.photo;
+        $("#detail-photo").alt = profile.name;
+        $("#detail-bio").textContent = profile.bio;
+        $("#detail-interests").innerHTML = profile.interests.map((interest) => `<span class="interest light">${esc(interest)}</span>`).join("");
+      }
+
+      function renderLikes() {
+        const people = [...initialLikes, ...matches];
+        $("#likes-grid").innerHTML = people.length
+          ? people.map((person, index) => `<article class="like-card">${safeImage(person.photo, `${person.name}'s profile`)}<button type="button" data-like-person="${index}" aria-label="Like ${person.name}"><svg><use href="#i-heart"/></svg></button><div class="like-card-info"><strong>${person.name}, ${person.age}</strong><span>${person.distance || "Nearby"}</span></div></article>`).join("")
+          : '<div class="empty-state">No likes just yet. Stay open to a little serendipity.</div>';
+        $("#likes-badge").textContent = String(people.length);
+        $("#likes-badge").hidden = people.length === 0;
+      }
+
+      function renderConversations() {
+        const list = $("#conversation-list");
+        if (!matches.length) {
+          list.innerHTML = '<div class="empty-state">Your next great conversation starts with a match.<br>Head to Discover and say hello.</div>';
+          return;
+        }
+        list.innerHTML = matches.map((person, index) => `<button class="conversation" type="button" data-chat-person="${index}">${safeImage(person.photo, "")}<span class="conversation-copy"><span class="conversation-name">${person.name}<span class="conversation-time">${index === 0 ? "now" : "today"}</span></span><span class="conversation-preview">${settings.hidePreviews ? "🔒 Encrypted message" : esc(person.preview || "You matched! Send a hello.")}</span></span>${index === 0 ? '<span class="unread" aria-label="Unread message"></span>' : ""}</button>`).join("");
+      }
+
+      async function openChat(person) {
+        activeMatch = person;
+        activeChat = person;
+        $("#chat-name").textContent = person.name;
+        $("#chat-avatar").src = person.photo;
+        $("#chat-body").replaceChildren();
+        $("#risk-banner").hidden = true;
+        $("#chat-view").classList.add("open");
+        $("#chat-view").setAttribute("aria-label", `Chat with ${person.name}`);
+        const chat = await chatFor(person);
+        if (activeChat !== person) return;
+        $("#e2ee-badge").textContent = chat.key ? `🔒 End-to-end encrypted · ${chat.safety}` : "⚠ Encryption unavailable in this browser";
+        if (!chat.msgs.length) {
+          await pushMessage(chat, "them", person.opener || "Hey! So happy we matched 😊");
+          await pushMessage(chat, "me", "Hey! Glad we matched. What’s something good about your week?");
+        }
+        const date = document.createElement("div");
+        date.className = "chat-date";
+        date.textContent = "You matched today. Say hello 👋";
+        $("#chat-body").append(date);
+        for (const message of chat.msgs) addBubble(message.from, await unseal(chat, message.sealed));
+        renderIcebreakers(person);
+        $("#chat-input").focus();
+      }
+
+      function closeModal(modal) {
+        modal.classList.remove("open");
+        if (modal.id === "create-modal" || modal.id === "verify-modal") stopCam();
+      }
+
+      function likeProfile(person = activeMatch) {
+        if (!matches.some((match) => match.name === person.name)) matches.unshift(person);
+        latestMatched = person;
+        renderLikes();
+        renderConversations();
+        $("#chat-badge").hidden = false;
+        $("#match-person").textContent = person.name;
+        $("#match-photo").src = person.photo;
+        $("#match-photo").alt = `${person.name}, your new match`;
+        $("#match-modal").classList.add("open");
+      }
+
+      document.querySelectorAll(".nav-button").forEach((button) => {
+        button.addEventListener("click", () => setView(button.dataset.view));
+      });
+      $("#filter-button").addEventListener("click", () => $("#filters-modal").classList.add("open"));
+      $("#profile-filters").addEventListener("click", () => $("#filters-modal").classList.add("open"));
+      $("#pass-button").addEventListener("click", () => {
+        profileIndex = (profileIndex + 1) % profiles.length;
+        renderProfile();
+        showToast("On to someone new ✨");
+      });
+      $("#like-button").addEventListener("click", () => {
+        likeProfile();
+        profileIndex = (profileIndex + 1) % profiles.length;
+        renderProfile();
+      });
+      $("#detail-like").addEventListener("click", () => {
+        closeModal($("#profile-modal"));
+        likeProfile();
+        profileIndex = (profileIndex + 1) % profiles.length;
+        renderProfile();
+      });
+      $("#boost-button").addEventListener("click", () => {
+        showToast(`A little spark sent to ${activeMatch.name} ✨`);
+        profileIndex = (profileIndex + 1) % profiles.length;
+        renderProfile();
+      });
+      $("#prompt-button").addEventListener("click", async () => {
+        await openChat(activeMatch);
+        $("#chat-input").value = `I saw you’re into ${activeMatch.interests[0].toLowerCase()}! What got you into it?`;
+      });
+      $("#profile-more").addEventListener("click", () => $("#profile-modal").classList.add("open"));
+      $("#report-button").addEventListener("click", () => {
+        closeModal($("#profile-modal"));
+        const name = activeMatch.name;
+        if (!settings.blocked.includes(name)) settings.blocked.push(name);
+        saveSettings();
+        profileIndex++;
+        renderProfile();
+        renderSecurity();
+        renderShorts();
+        showToast(`${name} was reported and blocked. Thanks for keeping the community safe.`);
+      });
+      $("#notifications-button").addEventListener("click", () => showToast("You’re all caught up 💛"));
+      $("#apply-filters").addEventListener("click", () => {
+        closeModal($("#filters-modal"));
+        showToast("Your discovery preferences are updated.");
+      });
+      $("#age-range").addEventListener("input", (event) => {
+        $("#age-value").textContent = `25 – ${event.target.value}`;
+      });
+      $("#distance-range").addEventListener("input", (event) => {
+        $("#distance-value").textContent = `${event.target.value} miles`;
+      });
+      document.querySelectorAll(".toggle:not([data-setting])").forEach((toggle) => {
+        toggle.addEventListener("click", () => toggle.setAttribute("aria-checked", toggle.getAttribute("aria-checked") !== "true" ? "true" : "false"));
+      });
+      document.querySelectorAll("[data-close]").forEach((button) => {
+        button.addEventListener("click", () => closeModal(button.closest(".backdrop")));
+      });
+      document.querySelectorAll(".backdrop").forEach((modal) => {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeModal(modal);
+        });
+      });
+      $("#send-message-button").addEventListener("click", () => {
+        closeModal($("#match-modal"));
+        setView("messages");
+        openChat(latestMatched);
+      });
+      $("#chat-back").addEventListener("click", () => {
+        $("#chat-view").classList.remove("open");
+        setView("messages");
+      });
+      $("#chat-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const input = $("#chat-input");
+        const message = input.value.trim();
+        if (!message || !activeChat) return;
+        const person = activeChat;
+        input.value = "";
+        showRisk(message);
+        const chat = await chatFor(person);
+        await pushMessage(chat, "me", message);
+        addBubble("me", message);
+        person.preview = message;
+        renderConversations();
+        replyFrom(person, chat);
+      });
+      $("#video-button").addEventListener("click", () => showToast("Video dates are coming soon. Keep chatting for now!"));
+      $("#likes-grid").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-like-person]");
+        if (!button) return;
+        const person = [...initialLikes, ...matches][Number(button.dataset.likePerson)];
+        if (person) likeProfile(person);
+      });
+      $("#conversation-list").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-chat-person]");
+        if (!button) return;
+        openChat(matches[Number(button.dataset.chatPerson)]);
+      });
+      document.querySelectorAll("[data-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.dataset.action === "privacy") openModal("security-modal");
+          else showToast("Profile editing is coming soon.");
+        });
+      });
+      $("#security-button").addEventListener("click", () => openModal("security-modal"));
+
+      // ===== Helpers =====
+      const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const fmt = (n) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K` : String(n));
+      const buzz = (ms = 12) => navigator.vibrate && navigator.vibrate(ms);
+      const te = new TextEncoder();
+      const td = new TextDecoder();
+      const b64e = (bytes) => btoa(String.fromCharCode(...bytes));
+      const b64d = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
+      const openModal = (id) => { $(`#${id}`).classList.add("open"); if (id === "security-modal") renderSecurity(); };
+      const myInterests = ["live music", "good food", "hiking", "art", "museums", "photography", "cooking", "tacos", "long walks"];
+      function compat(person) {
+        const overlap = person.interests.filter((interest) => myInterests.includes(interest.toLowerCase())).length;
+        let seed = 0;
+        for (const ch of person.name) seed = (seed * 31 + ch.charCodeAt(0)) % 17;
+        return Math.min(98, 70 + overlap * 7 + seed);
+      }
+
+      // ===== Settings, privacy & app lock =====
+      const SKEY = "instami.settings.v1";
+      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], failCount: 0, lockUntil: 0 };
+      try {
+        const saved = JSON.parse(localStorage.getItem(SKEY) || "{}");
+        Object.keys(settings).forEach((key) => {
+          if (key in saved && (settings[key] === null || typeof saved[key] === typeof settings[key])) settings[key] = saved[key];
+        });
+      } catch { /* ignore corrupt settings */ }
+      function saveSettings() {
+        try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch { /* storage unavailable */ }
+      }
+      function applySettings() {
+        document.documentElement.dataset.theme = settings.dark ? "dark" : "light";
+        document.body.classList.toggle("blur-photos", settings.blurPhotos);
+        $("#location-text").textContent = settings.incognito ? "Incognito" : "Brooklyn, NY";
+        $("#my-verified").hidden = !settings.verified;
+      }
+      async function hashPin(pin, saltB64) {
+        const key = await crypto.subtle.importKey("raw", te.encode(pin), "PBKDF2", false, ["deriveBits"]);
+        const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: b64d(saltB64), iterations: 210000, hash: "SHA-256" }, key, 256);
+        return b64e(new Uint8Array(bits));
+      }
+      function renderSecurity() {
+        document.querySelectorAll("[data-setting]").forEach((toggle) => toggle.setAttribute("aria-checked", String(Boolean(settings[toggle.dataset.setting]))));
+        const secure = Boolean(window.crypto && crypto.subtle);
+        const checks = [[settings.pinHash, 25], [settings.passkey, 25], [settings.verified, 20], [secure, 10], [settings.autoLock && settings.pinHash, 10], [settings.hideDistance || settings.incognito, 10]];
+        const score = checks.reduce((sum, [on, points]) => sum + (on ? points : 0), 0);
+        $("#sec-score").textContent = `${score}/100`;
+        $("#sec-score-bar").style.width = `${score}%`;
+        $("#profile-sec-score").textContent = `${score}/100`;
+        $("#pin-status").textContent = settings.pinHash ? "PIN is on. Locks after 2 minutes idle or when you leave the tab." : "Salted PBKDF2 hash. Locks after 2 minutes idle or when you leave the tab.";
+        $("#pin-set").textContent = settings.pinHash ? "Change" : "Set";
+        $("#pin-remove").hidden = !settings.pinHash;
+        $("#passkey-btn").textContent = settings.passkey ? "Added ✓" : "Create";
+        $("#passkey-btn").classList.toggle("good", settings.passkey);
+        $("#verify-btn").textContent = settings.verified ? "Verified ✓" : "Start";
+        $("#verify-btn").classList.toggle("good", settings.verified);
+        $("#e2ee-pill").textContent = secure ? "Always on" : "Unavailable";
+        $("#blocked-list").textContent = settings.blocked.length ? `Blocked: ${settings.blocked.join(", ")}` : "No one blocked.";
+        applySettings();
+      }
+      document.querySelectorAll("[data-setting]").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          const key = toggle.dataset.setting;
+          settings[key] = !settings[key];
+          saveSettings();
+          renderSecurity();
+          renderProfile();
+          renderConversations();
+          resetIdle();
+        });
+      });
+      $("#pin-set").addEventListener("click", async () => {
+        const pin = $("#pin-input").value;
+        if (!/^\d{4,8}$/.test(pin)) return showToast("Use a PIN of 4 to 8 digits.");
+        if (!window.crypto || !crypto.subtle) return showToast("Secure storage isn’t available in this browser.");
+        const salt = b64e(crypto.getRandomValues(new Uint8Array(16)));
+        settings.pinSalt = salt;
+        settings.pinHash = await hashPin(pin, salt);
+        settings.failCount = 0;
+        settings.lockUntil = 0;
+        $("#pin-input").value = "";
+        saveSettings();
+        renderSecurity();
+        resetIdle();
+        showToast("App lock is on 🔒");
+      });
+      $("#pin-remove").addEventListener("click", () => {
+        settings.pinHash = null;
+        settings.pinSalt = null;
+        saveSettings();
+        renderSecurity();
+        showToast("App lock removed.");
+      });
+      $("#lock-now").addEventListener("click", () => (settings.pinHash ? lock() : showToast("Set a PIN first to lock the app.")));
+      function lock() {
+        if (!settings.pinHash) return;
+        document.querySelectorAll(".backdrop.open").forEach((modal) => closeModal(modal));
+        $(".app").inert = true;
+        pauseShorts();
+        stopCam();
+        $("#lock-screen").classList.add("open");
+        $("#lock-pin").value = "";
+        $("#lock-msg").textContent = "";
+        $("#lock-pin").focus();
+      }
+      $("#lock-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = $("#lock-msg");
+        const wait = settings.lockUntil - Date.now();
+        if (wait > 0) { message.textContent = `Too many attempts. Try again in ${Math.ceil(wait / 1000)}s.`; return; }
+        const attempt = await hashPin($("#lock-pin").value, settings.pinSalt);
+        if (attempt === settings.pinHash) {
+          settings.failCount = 0;
+          saveSettings();
+          $("#lock-screen").classList.remove("open");
+          $(".app").inert = false;
+          resetIdle();
+          playVisible();
+        } else {
+          settings.failCount++;
+          if (settings.failCount >= 5) settings.lockUntil = Date.now() + Math.min(300, 30 * 2 ** (settings.failCount - 5)) * 1000;
+          saveSettings();
+          message.textContent = settings.failCount >= 5 ? "Too many attempts. Please wait before trying again." : "That PIN isn’t right.";
+          $("#lock-pin").value = "";
+        }
+      });
+      let idleTimer;
+      function resetIdle() {
+        window.clearTimeout(idleTimer);
+        if (settings.pinHash && settings.autoLock) idleTimer = window.setTimeout(lock, 120000);
+      }
+      ["pointerdown", "keydown", "scroll"].forEach((name) => document.addEventListener(name, resetIdle, { passive: true, capture: true }));
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && settings.autoLock) lock();
+        playVisible();
+      });
+      $("#passkey-btn").addEventListener("click", async () => {
+        if (!window.PublicKeyCredential) return showToast("Passkeys aren’t supported in this browser.");
+        try {
+          await navigator.credentials.create({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: "Instami" }, user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "jordan@instami", displayName: "Jordan" }, pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { residentKey: "preferred", userVerification: "required" }, timeout: 60000 } });
+          settings.passkey = true;
+          saveSettings();
+          renderSecurity();
+          showToast("Passkey added. No passwords to steal 🔑");
+        } catch (error) {
+          showToast(error && error.name === "SecurityError" ? "Passkeys need an https:// or localhost page." : "Passkey setup was cancelled.");
+        }
+      });
+      $("#checkin-share").addEventListener("click", async () => {
+        const place = $("#checkin-place").value.trim() || "a public place";
+        const text = `Safety check-in: I’m meeting ${activeMatch.name} (met on Instami) at ${place} around ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}. I’ll message you when I’m home safe.`;
+        try {
+          if (navigator.share) await navigator.share({ title: "Date check-in", text });
+          else { await navigator.clipboard.writeText(text); showToast("Check-in copied. Paste it to a trusted friend."); }
+        } catch (error) {
+          if (!error || error.name !== "AbortError") showToast("Couldn’t share. Try copying it manually.");
+        }
+      });
+      $("#export-btn").addEventListener("click", () => {
+        const data = { exportedAt: new Date().toISOString(), settings: { ...settings, pinHash: undefined, pinSalt: undefined }, matches: matches.map((m) => m.name), postedShorts: shorts.filter((s) => s.mine).map((s) => ({ caption: s.caption })) };
+        const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "instami-my-data.json";
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+      $("#wipe-btn").addEventListener("click", () => {
+        if (!window.confirm("Delete all Instami data stored on this device?")) return;
+        try { localStorage.removeItem(SKEY); } catch { /* ignore */ }
+        window.location.reload();
+      });
+
+      // ===== End-to-end encrypted chat (ECDH P-256 + AES-256-GCM) =====
+      let activeChat = null;
+      const chats = new Map();
+      async function buildChat() {
+        const chat = { msgs: [], key: null, safety: "" };
+        if (!window.crypto || !crypto.subtle) return chat;
+        const pair = () => crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]);
+        const [mine, theirs] = await Promise.all([pair(), pair()]);
+        chat.key = await crypto.subtle.deriveKey({ name: "ECDH", public: theirs.publicKey }, mine.privateKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+        const a = new Uint8Array(await crypto.subtle.exportKey("raw", mine.publicKey));
+        const b = new Uint8Array(await crypto.subtle.exportKey("raw", theirs.publicKey));
+        const joined = new Uint8Array(a.length + b.length);
+        joined.set(a);
+        joined.set(b, a.length);
+        const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", joined));
+        chat.safety = Array.from(hash.slice(0, 6), (byte) => String(byte).padStart(3, "0")).join(" ");
+        return chat;
+      }
+      const chatFor = (person) => {
+        if (!chats.has(person.name)) chats.set(person.name, buildChat());
+        return chats.get(person.name);
+      };
+      async function seal(chat, text) {
+        if (!chat.key) return { text };
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        return { iv, data: await crypto.subtle.encrypt({ name: "AES-GCM", iv }, chat.key, te.encode(text)) };
+      }
+      async function unseal(chat, sealed) {
+        if (!chat.key) return sealed.text;
+        return td.decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: sealed.iv }, chat.key, sealed.data));
+      }
+      async function pushMessage(chat, from, text) {
+        chat.msgs.push({ from, sealed: await seal(chat, text) });
+      }
+      function addBubble(from, text) {
+        const bubble = document.createElement("div");
+        bubble.className = `message ${from}`;
+        bubble.textContent = text;
+        $("#chat-body").append(bubble);
+        $("#chat-body").scrollTop = $("#chat-body").scrollHeight;
+        return bubble;
+      }
+      const RISKS = [
+        [/\b(gift ?cards?|wire transfer|western union|bitcoin|crypto|invest(ment)?|cash ?app|venmo|paypal|send (me )?money)\b/i, "Never send money, gift cards or crypto to someone you haven’t met."],
+        [/\b(whatsapp|telegram|signal|snapchat)\b|https?:\/\/|www\./i, "Moving off the app or sharing links? Keep chatting here until you really trust them."],
+        [/\+?\d[\d\s().-]{8,}\d|[\w.-]+@[\w-]+\.\w+|\b\d{1,5}\s+\w+\s+(st|street|ave|avenue|road|rd|lane|ln)\b/i, "That looks like personal info. Think twice before sharing phone numbers, emails or addresses."]
+      ];
+      function showRisk(text) {
+        const hit = RISKS.find(([pattern]) => pattern.test(text));
+        $("#risk-banner").hidden = !hit;
+        if (hit) $("#risk-text").textContent = hit[1];
+      }
+      $("#risk-dismiss").addEventListener("click", () => { $("#risk-banner").hidden = true; });
+      function renderIcebreakers(person) {
+        const [first, second = first] = person.interests.map((interest) => interest.toLowerCase());
+        const ideas = [`What got you into ${first}?`, `Best ${second} tip you’ve got?`, "Two truths and a lie — you first?"];
+        $("#icebreakers").replaceChildren(...ideas.map((idea) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.textContent = `✨ ${idea}`;
+          chip.addEventListener("click", () => { $("#chat-input").value = idea; $("#chat-input").focus(); });
+          return chip;
+        }));
+      }
+      const REPLIES = ["Haha, love that 😄", "Ooh, tell me more!", "Okay, you have great taste.", "We should plan that — coffee this week?", "That made my day, honestly."];
+      function replyFrom(person, chat) {
+        const typing = addBubble("them", "typing…");
+        typing.classList.add("typing");
+        window.setTimeout(async () => {
+          typing.remove();
+          const reply = REPLIES[Math.floor(Math.random() * REPLIES.length)];
+          await pushMessage(chat, "them", reply);
+          person.preview = reply;
+          renderConversations();
+          if (activeChat === person) addBubble("them", reply);
+        }, 1300);
+      }
+      let voiceRecorder = null;
+      $("#voice-button").addEventListener("click", async () => {
+        if (voiceRecorder) { voiceRecorder.stop(); return; }
+        if (!window.MediaRecorder || !navigator.mediaDevices) return showToast("Voice notes aren’t supported in this browser.");
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const chunks = [];
+          const recorder = new MediaRecorder(stream);
+          voiceRecorder = recorder;
+          recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+          recorder.onstop = () => {
+            stream.getTracks().forEach((track) => track.stop());
+            voiceRecorder = null;
+            $("#voice-button").classList.remove("recording");
+            if (!chunks.length) return;
+            const audio = document.createElement("audio");
+            audio.controls = true;
+            audio.src = URL.createObjectURL(new Blob(chunks, { type: recorder.mimeType || "audio/webm" }));
+            addBubble("me", "").append(audio);
+          };
+          recorder.start();
+          $("#voice-button").classList.add("recording");
+          showToast("Recording… tap again to send");
+          window.setTimeout(() => { if (recorder.state === "recording") recorder.stop(); }, 30000);
+        } catch {
+          showToast("Microphone permission is needed for voice notes.");
+        }
+      });
+
+      // ===== Camera: record shorts & live photo check =====
+      let camStream = null;
+      let shortRecorder = null;
+      let recordedUrl = null;
+      let recTimer = null;
+      async function startCam(video, withAudio) {
+        stopCam();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("unsupported");
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 720 } }, audio: withAudio });
+        video.srcObject = camStream;
+        video.muted = true;
+        await video.play();
+      }
+      function stopCam() {
+        window.clearInterval(recTimer);
+        if (shortRecorder && shortRecorder.state === "recording") shortRecorder.stop();
+        if (camStream) camStream.getTracks().forEach((track) => track.stop());
+        camStream = null;
+        $("#rec-button").classList.remove("on");
+      }
+      $("#verify-btn").addEventListener("click", async () => {
+        const poses = ["✌️ Peace sign", "👍 Thumbs up", "👋 Wave hello", "🤞 Crossed fingers"];
+        $("#verify-gesture").textContent = poses[Math.floor(Math.random() * poses.length)];
+        openModal("verify-modal");
+        try { await startCam($("#verify-video"), false); } catch { closeModal($("#verify-modal")); showToast("Camera permission is needed for the live photo check."); }
+      });
+      $("#verify-capture").addEventListener("click", () => {
+        const video = $("#verify-video");
+        if (!camStream || !video.videoWidth) return showToast("Camera isn’t ready yet.");
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, 32, 32);
+        const pixels = ctx.getImageData(0, 0, 32, 32).data;
+        let sum = 0;
+        for (let i = 0; i < pixels.length; i += 4) sum += pixels[i] + pixels[i + 1] + pixels[i + 2];
+        if (sum / (pixels.length / 4 * 3) < 20) return showToast("Too dark. Move somewhere brighter and retry.");
+        settings.verified = true;
+        saveSettings();
+        closeModal($("#verify-modal"));
+        renderSecurity();
+        showToast("Photo check complete. You’re verified ✅");
+      });
+      $("#short-create").addEventListener("click", async () => {
+        recordedUrl = null;
+        $("#short-post").disabled = true;
+        $("#short-caption-input").value = "";
+        const preview = $("#cam-preview");
+        preview.controls = false;
+        preview.loop = false;
+        $("#cam-box").classList.add("mirror");
+        $("#cam-timer").textContent = "Camera ready";
+        openModal("create-modal");
+        try { await startCam(preview, true); } catch { showToast("Camera and microphone permission are needed, or upload a video instead."); }
+      });
+      $("#rec-button").addEventListener("click", () => {
+        const preview = $("#cam-preview");
+        if (shortRecorder && shortRecorder.state === "recording") { shortRecorder.stop(); return; }
+        if (!camStream || !window.MediaRecorder) return showToast("Recording isn’t available. Try uploading a video.");
+        const mime = ["video/webm;codecs=vp9,opus", "video/webm", "video/mp4"].find((type) => MediaRecorder.isTypeSupported(type));
+        const chunks = [];
+        const recorder = new MediaRecorder(camStream, mime ? { mimeType: mime } : undefined);
+        shortRecorder = recorder;
+        recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+        recorder.onstop = () => {
+          window.clearInterval(recTimer);
+          $("#rec-button").classList.remove("on");
+          shortRecorder = null;
+          if (!chunks.length) return;
+          recordedUrl = URL.createObjectURL(new Blob(chunks, { type: recorder.mimeType || "video/webm" }));
+          if (camStream) camStream.getTracks().forEach((track) => track.stop());
+          camStream = null;
+          preview.srcObject = null;
+          preview.src = recordedUrl;
+          preview.muted = false;
+          preview.controls = true;
+          preview.loop = true;
+          $("#cam-box").classList.remove("mirror");
+          preview.play().catch(() => {});
+          $("#cam-timer").textContent = "Preview";
+          $("#short-post").disabled = false;
+        };
+        recorder.start();
+        $("#rec-button").classList.add("on");
+        let seconds = 0;
+        recTimer = window.setInterval(() => {
+          seconds++;
+          $("#cam-timer").textContent = `● ${seconds}s / 30s`;
+          if (seconds >= 30 && recorder.state === "recording") recorder.stop();
+        }, 1000);
+      });
+      $("#short-file").addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        event.target.value = "";
+        if (!file) return;
+        if (!file.type.startsWith("video/") || file.size > 150 * 1024 * 1024) return showToast("Please choose a video under 150 MB.");
+        stopCam();
+        recordedUrl = URL.createObjectURL(file);
+        const preview = $("#cam-preview");
+        preview.srcObject = null;
+        preview.src = recordedUrl;
+        preview.muted = false;
+        preview.controls = true;
+        preview.loop = true;
+        $("#cam-box").classList.remove("mirror");
+        preview.play().catch(() => {});
+        $("#cam-timer").textContent = "Preview";
+        $("#short-post").disabled = false;
+      });
+      $("#short-post").addEventListener("click", () => {
+        if (!recordedUrl) return;
+        const caption = $("#short-caption-input").value.trim() || "My first short ✨";
+        const tags = (caption.match(/#\w+/g) || []).map((tag) => tag.slice(1)).slice(0, 4);
+        shorts.unshift({ id: Date.now(), author: "You", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80", src: recordedUrl, poster: "", caption, tags, music: "Original sound · You", likes: 0, comments: [], near: true, mine: true });
+        closeModal($("#create-modal"));
+        shortsFilter = "foryou";
+        document.querySelectorAll(".shorts-tabs button").forEach((tab) => tab.classList.toggle("active", tab.dataset.feed === "foryou"));
+        renderShorts();
+        setView("shorts");
+        showToast("Your short is live ✨");
+      });
+
+      // ===== Shorts feed =====
+      const shorts = [
+        { id: 1, author: "Alex", photo: profiles[0].photo, src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", poster: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=700&q=70", caption: "Saturday dumpling run — tell me your order 🥟", tags: ["foodie", "nyc", "weekend"], music: "Original sound · Alex", likes: 1240, near: true, comments: [{ user: "Maya", text: "Chili crisp on everything." }, { user: "Sam", text: "Okay now I’m hungry 😅" }] },
+        { id: 2, author: "Maya", photo: profiles[2].photo, src: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4", poster: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=700&q=70", caption: "Golden hour finds me every time 📸", tags: ["photography", "goldenhour"], music: "Sunny Afternoon · Lo-fi", likes: 3820, near: true, comments: [{ user: "Riley", text: "That light 😍" }] },
+        { id: 3, author: "Sam", photo: profiles[1].photo, src: "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4", poster: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=700&q=70", caption: "Trail day with my favorite co-pilot 🐕", tags: ["hiking", "dogsofinstami"], music: "Trail Mix · Indie", likes: 905, near: false, comments: [] },
+        { id: 4, author: "Jamie", photo: profiles[3].photo, src: "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4", poster: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=70", caption: "Throwing a wonky mug. Rate it 1–10 🏺", tags: ["ceramics", "makers"], music: "Wheel Spin · Ambient", likes: 2150, near: false, comments: [{ user: "Alex", text: "A solid 11." }] },
+        { id: 5, author: "Riley", photo: profiles[4].photo, src: "https://samplelib.com/lib/preview/mp4/sample-10s.mp4", poster: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=700&q=70", caption: "Museum date idea + one truly bad pun 🎨", tags: ["museums", "datenight"], music: "Gallery Walk · Jazz", likes: 640, near: true, comments: [] }
+      ];
+      shorts.forEach((item) => { item.liked = false; item.saved = false; });
+      let shortsFilter = "foryou";
+      let shortsMuted = true;
+      let tapTimer;
+      let lastIndex = 0;
+      const railButton = (act, icon, label, count) => `<button class="rail-btn" type="button" data-act="${act}" aria-label="${label}"><span class="rail-icon"><svg><use href="#${icon}"/></svg></span>${count === undefined ? "" : `<span data-count="${act}">${count}</span>`}</button>`;
+      function shortEl(item) {
+        const el = document.createElement("article");
+        el.className = "short";
+        el.dataset.id = item.id;
+        const following = settings.following.includes(item.author);
+        const person = profiles.find((p) => p.name === item.author);
+        el.innerHTML = `<video muted loop playsinline preload="metadata" ${item.poster ? `poster="${esc(item.poster)}"` : ""} src="${esc(item.src)}"></video><div class="heart-burst" aria-hidden="true"><svg><use href="#i-heart-fill"/></svg></div><div class="short-info"><div class="short-author"><img src="${esc(item.photo)}" alt=""><strong>${esc(item.author)}</strong>${item.mine ? "" : `<button class="follow-btn ${following ? "on" : ""}" type="button" data-act="follow">${following ? "Following" : "Follow"}</button>`}</div><p class="short-caption">${esc(item.caption)}</p><div class="short-tags">${item.tags.map((tag) => `#${esc(tag)}`).join(" ")}</div><div class="short-music">🎵 ${esc(item.music)}</div></div><div class="short-rail">${person && !settings.blocked.includes(item.author) ? `<button class="rail-btn match" type="button" data-act="match" aria-label="Like ${esc(item.author)} as a match"><span class="rail-icon"><svg><use href="#i-spark"/></svg></span><span>Match</span></button>` : ""}${railButton("like", item.liked ? "i-heart-fill" : "i-heart", "Like", fmt(item.likes))}${railButton("comment", "i-chat", "Comments", item.comments.length)}${railButton("save", item.saved ? "i-bookmark-fill" : "i-bookmark", "Save", "Save")}${railButton("share", "i-share", "Share", "Share")}</div><div class="short-progress"><span></span></div>`;
+        el.querySelector('[data-act="like"]').classList.toggle("on", item.liked);
+        el.querySelector('[data-act="save"]').classList.toggle("on", item.saved);
+        const video = el.querySelector("video");
+        video.muted = shortsMuted;
+        return el;
+      }
+      function renderShorts() {
+        const feed = $("#shorts-feed");
+        feed.replaceChildren();
+        const list = shorts.filter((item) => !settings.blocked.includes(item.author) && (shortsFilter === "foryou" || (shortsFilter === "nearby" && item.near) || (shortsFilter === "following" && (item.mine || settings.following.includes(item.author)))));
+        if (!list.length) {
+          const empty = document.createElement("div");
+          empty.className = "short-empty";
+          empty.textContent = shortsFilter === "following" ? "Follow creators to build your feed." : "Nothing here yet.";
+          feed.append(empty);
+          return;
+        }
+        list.forEach((item) => feed.append(shortEl(item)));
+        feed.scrollTop = 0;
+        lastIndex = 0;
+        playVisible();
+      }
+      function pauseShorts() {
+        document.querySelectorAll("#shorts-feed video").forEach((video) => video.pause());
+      }
+      function playVisible() {
+        const feed = $("#shorts-feed");
+        const active = $("#shorts-view").classList.contains("active") && !document.hidden && !$("#lock-screen").classList.contains("open");
+        const index = Math.round(feed.scrollTop / (feed.clientHeight || 1));
+        [...feed.children].forEach((el, i) => {
+          const video = el.querySelector("video");
+          if (!video) return;
+          video.muted = shortsMuted;
+          if (active && i === index && !el.classList.contains("paused")) video.play().catch(() => {});
+          else video.pause();
+        });
+      }
+      let scrollFrame = 0;
+      $("#shorts-feed").addEventListener("scroll", () => {
+        window.cancelAnimationFrame(scrollFrame);
+        scrollFrame = window.requestAnimationFrame(() => {
+          const feed = $("#shorts-feed");
+          const index = Math.round(feed.scrollTop / (feed.clientHeight || 1));
+          if (index !== lastIndex) {
+            lastIndex = index;
+            const el = feed.children[index];
+            if (el) { el.classList.remove("paused"); const video = el.querySelector("video"); if (video) video.currentTime = 0; }
+          }
+          playVisible();
+        });
+      }, { passive: true });
+      $("#shorts-feed").addEventListener("timeupdate", (event) => {
+        const video = event.target;
+        const bar = video.parentElement && video.parentElement.querySelector(".short-progress span");
+        if (bar && video.duration) bar.style.width = `${(video.currentTime / video.duration) * 100}%`;
+      }, true);
+      function updateRail(el, item) {
+        const like = el.querySelector('[data-act="like"]');
+        like.classList.toggle("on", item.liked);
+        like.querySelector("use").setAttribute("href", item.liked ? "#i-heart-fill" : "#i-heart");
+        like.querySelector("[data-count]").textContent = fmt(item.likes);
+        const save = el.querySelector('[data-act="save"]');
+        save.classList.toggle("on", item.saved);
+        save.querySelector("use").setAttribute("href", item.saved ? "#i-bookmark-fill" : "#i-bookmark");
+        el.querySelector('[data-act="comment"] [data-count]').textContent = item.comments.length;
+      }
+      function likeShort(item, el, forceLike) {
+        if (forceLike) {
+          if (!item.liked) { item.liked = true; item.likes++; }
+        } else {
+          item.liked = !item.liked;
+          item.likes += item.liked ? 1 : -1;
+        }
+        updateRail(el, item);
+        buzz();
+        const burst = el.querySelector(".heart-burst");
+        burst.classList.remove("go");
+        void burst.offsetWidth;
+        burst.classList.add("go");
+      }
+      let commentsFor = null;
+      function renderComments() {
+        const list = $("#comments-list");
+        list.replaceChildren();
+        if (!commentsFor.comments.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "No comments yet. Start the conversation!";
+          list.append(empty);
+          return;
+        }
+        commentsFor.comments.forEach((comment) => {
+          const row = document.createElement("div");
+          row.className = "comment";
+          const who = document.createElement("b");
+          who.textContent = comment.user;
+          const text = document.createElement("p");
+          text.textContent = comment.text;
+          row.append(who, text);
+          list.append(row);
+        });
+      }
+      $("#comment-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = $("#comment-input");
+        const text = input.value.trim();
+        if (!text || !commentsFor) return;
+        commentsFor.comments.push({ user: "You", text });
+        input.value = "";
+        renderComments();
+        const el = document.querySelector(`.short[data-id="${commentsFor.id}"]`);
+        if (el) updateRail(el, commentsFor);
+      });
+      async function shareText(title, text) {
+        try {
+          if (navigator.share) await navigator.share({ title, text });
+          else { await navigator.clipboard.writeText(text); showToast("Copied to clipboard"); }
+        } catch (error) {
+          if (!error || error.name !== "AbortError") showToast("Sharing isn’t available here.");
+        }
+      }
+      $("#shorts-feed").addEventListener("click", (event) => {
+        const el = event.target.closest(".short");
+        if (!el) return;
+        const item = shorts.find((entry) => String(entry.id) === el.dataset.id);
+        if (!item) return;
+        const button = event.target.closest("[data-act]");
+        if (button) {
+          const act = button.dataset.act;
+          if (act === "like") likeShort(item, el);
+          if (act === "save") { item.saved = !item.saved; updateRail(el, item); showToast(item.saved ? "Saved to your collection" : "Removed from saved"); }
+          if (act === "comment") { commentsFor = item; $("#comments-sub").textContent = `On ${item.author}’s short`; renderComments(); openModal("comments-modal"); }
+          if (act === "share") shareText("Instami short", `${item.author}: ${item.caption}`);
+          if (act === "follow") {
+            const idx = settings.following.indexOf(item.author);
+            if (idx >= 0) settings.following.splice(idx, 1); else settings.following.push(item.author);
+            saveSettings();
+            const following = settings.following.includes(item.author);
+            button.textContent = following ? "Following" : "Follow";
+            button.classList.toggle("on", following);
+          }
+          if (act === "match") { const person = profiles.find((p) => p.name === item.author); if (person) likeProfile(person); }
+          return;
+        }
+        window.clearTimeout(tapTimer);
+        if (event.detail >= 2) { likeShort(item, el, true); return; }
+        tapTimer = window.setTimeout(() => {
+          const video = el.querySelector("video");
+          if (video.paused) { el.classList.remove("paused"); video.play().catch(() => {}); } else { el.classList.add("paused"); video.pause(); }
+        }, 230);
+      });
+      document.querySelectorAll(".shorts-tabs button").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          shortsFilter = tab.dataset.feed;
+          document.querySelectorAll(".shorts-tabs button").forEach((other) => other.classList.toggle("active", other === tab));
+          renderShorts();
+        });
+      });
+      $("#short-mute").addEventListener("click", () => {
+        shortsMuted = !shortsMuted;
+        $("#short-mute").textContent = shortsMuted ? "🔇" : "🔊";
+        $("#short-mute").setAttribute("aria-label", shortsMuted ? "Unmute videos" : "Mute videos");
+        playVisible();
+      });
+
+      // ===== Swipe gestures & keyboard shortcuts =====
+      const card = $("#discovery-card");
+      let drag = null;
+      card.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        drag = { x: event.clientX, y: event.clientY, dx: 0, moved: false, id: event.pointerId };
+      });
+      card.addEventListener("pointermove", (event) => {
+        if (!drag || event.pointerId !== drag.id) return;
+        drag.dx = event.clientX - drag.x;
+        if (!drag.moved && Math.abs(drag.dx) > 8 && Math.abs(drag.dx) > Math.abs(event.clientY - drag.y)) {
+          drag.moved = true;
+          card.setPointerCapture(event.pointerId);
+        }
+        if (drag.moved) {
+          card.style.transition = "none";
+          card.style.transform = `translateX(${drag.dx}px) rotate(${drag.dx / 18}deg)`;
+          card.dataset.swipe = drag.dx > 0 ? "like" : "pass";
+        }
+      });
+      const endDrag = () => {
+        if (!drag) return;
+        const finished = drag;
+        drag = null;
+        card.style.transition = "transform .22s";
+        if (finished.moved && Math.abs(finished.dx) > 110) {
+          card.style.transform = `translateX(${Math.sign(finished.dx) * 600}px) rotate(${finished.dx / 10}deg)`;
+          window.setTimeout(() => {
+            card.style.transition = "none";
+            card.style.transform = "";
+            delete card.dataset.swipe;
+            (finished.dx > 0 ? $("#like-button") : $("#pass-button")).click();
+          }, 180);
+        } else {
+          card.style.transform = "";
+          delete card.dataset.swipe;
+        }
+      };
+      card.addEventListener("pointerup", endDrag);
+      card.addEventListener("pointercancel", endDrag);
+      document.addEventListener("keydown", (event) => {
+        if (!$("#discover-view").classList.contains("active") || document.querySelector(".backdrop.open") || $("#chat-view").classList.contains("open") || event.target.closest("input")) return;
+        if (event.key === "ArrowRight") $("#like-button").click();
+        if (event.key === "ArrowLeft") $("#pass-button").click();
+      });
+
+      applySettings();
+      renderSecurity();
+      renderShorts();
+      renderProfile();
+      renderLikes();
+      renderConversations();
+      if (settings.pinHash) lock();
+      resetIdle();
+    })();
+  </script>
 </body>
 </html>
