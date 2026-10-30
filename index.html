@@ -1265,6 +1265,7 @@
           } catch { showToast("Message not sent. Check your connection."); input.value = message; }
           return;
         }
+        const chat = await chatFor(person);
         await pushMessage(chat, "me", message);
         addBubble("me", message);
         person.preview = message;
