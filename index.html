@@ -2621,13 +2621,20 @@
         renderProfile();
         renderPicks();
       }
+      function dataUrlToBlob(url) {
+        const [head, body] = url.split(",");
+        const bytes = Uint8Array.from(atob(body), (c) => c.charCodeAt(0));
+        return new Blob([bytes], { type: (head.match(/data:([^;]+)/) || [])[1] || "image/jpeg" });
+      }
       async function syncMyProfile() {
         const urls = [];
+        let photoFailed = false;
         for (const photo of settings.photos.slice(0, MAX_PHOTOS)) {
-          if (photo.startsWith("data:")) urls.push(await cloud.uploadPhoto(await (await fetch(photo)).blob()));
-          else urls.push(photo);
+          if (!photo.startsWith("data:")) { urls.push(photo); continue; }
+          try { urls.push(await cloud.uploadPhoto(dataUrlToBlob(photo))); } catch { photoFailed = true; }
         }
         await cloud.saveMyProfile({ name: settings.name, age: settings.age, bio: settings.bio, city: settings.city, interests: settings.interests, photos: urls });
+        if (photoFailed) throw new Error("Profile saved, but a photo failed to upload. Check that the photos bucket exists in Supabase Storage.");
       }
       async function cloudSwipe(person, action) {
         try {
