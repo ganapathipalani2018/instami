@@ -866,6 +866,7 @@
         });
         $("#chat-view").classList.remove("open");
         if (name === "events") renderEvents();
+        if (name === "messages" && typeof cloud !== "undefined" && cloud && cloud.isSignedIn()) loadCloudMatches(null, true).catch(() => {});
         window.scrollTo({ top: 0, behavior: "smooth" });
         playVisible();
       }
@@ -2599,18 +2600,32 @@
           prompt: ["About me", bio || "Say hello and find out."], opener: "", remoteId: row.id, remoteMatchId: matchId || ""
         };
       }
-      async function loadCloudMatches(rows) {
+      async function loadCloudMatches(rows, announce = false) {
         const list = rows || (await cloud.matches()) || [];
         const me = cloud.userId();
         const known = new Set(matches.map((m) => m.remoteMatchId).filter(Boolean));
         const fresh = list.filter((m) => !known.has(m.id));
         if (!fresh.length) return;
         const people = (await cloud.profilesByIds(fresh.map((m) => (m.user_a === me ? m.user_b : m.user_a)))) || [];
+        const added = [];
         fresh.forEach((m) => {
           const other = people.find((p) => p.id === (m.user_a === me ? m.user_b : m.user_a));
-          if (other) matches.push(remoteToLocal(other, m.id));
+          if (other && !matches.some((x) => x.remoteMatchId === m.id)) { const person = remoteToLocal(other, m.id); matches.push(person); added.push(person); }
         });
         renderConversations();
+        if (announce && added.length) {
+          added.forEach((person) => pushNotification(`It’s a match with ${person.name} 💘`));
+          $("#chat-badge").hidden = false;
+          showToast(`New match: ${added.map((p) => p.name).join(", ")} 💘 Open Chats to say hello`);
+        }
+      }
+      // Matches are created on the server when the other person likes back, so check regularly.
+      let matchPoll;
+      function startMatchPolling() {
+        window.clearInterval(matchPoll);
+        matchPoll = window.setInterval(() => {
+          if (cloud && cloud.isSignedIn() && document.visibilityState === "visible") loadCloudMatches(null, true).catch(() => {});
+        }, 8000);
       }
       async function loadCloud() {
         if (!cloud || !cloud.isSignedIn()) return;
@@ -2618,6 +2633,7 @@
         const have = new Set(profiles.map((p) => p.remoteId).filter(Boolean));
         (people || []).forEach((row) => { if (!have.has(row.id)) profiles.push(remoteToLocal(row)); });
         await loadCloudMatches(rows || []);
+        startMatchPolling();
         renderProfile();
         renderPicks();
       }
@@ -2747,6 +2763,7 @@
         for (let i = profiles.length - 1; i >= 0; i--) if (profiles[i].remoteId) profiles.splice(i, 1);
         for (let i = matches.length - 1; i >= 0; i--) if (matches[i].remoteId) matches.splice(i, 1);
         window.clearInterval(cloudTimer);
+        window.clearInterval(matchPoll);
         profileIndex = 0;
         renderProfile();
         renderConversations();
@@ -2759,6 +2776,7 @@
       });
       $("#profile-account").addEventListener("click", () => openModal("account-modal"));
       if (cloud && cloud.isSignedIn()) loadCloud().catch(() => showToast("Cloud sync unavailable right now."));
+      if (cloud && cloud.isSignedIn()) startMatchPolling();
 
       // ===== PWA =====
       if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
