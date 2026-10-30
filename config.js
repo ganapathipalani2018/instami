@@ -2,6 +2,6 @@
 // The anon key is designed to be public; Row Level Security in supabase/schema.sql protects the data.
 // Never put the service_role key here.
 window.INSTAMI_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: ""
+  supabaseUrl: "https://niiprltwzlhjpjpqatvo.supabase.co",
+  supabaseAnonKey: "sb_publishable_smOWNM-P7wvdoeXg4WP_4A_912iSsNL"
 };
