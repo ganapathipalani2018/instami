@@ -3,9 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#fffaf7">
+  <meta name="theme-color" content="#e75b6b">
   <meta name="description" content="Meet people who feel like your kind of people.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; img-src https://images.unsplash.com blob:; media-src blob: https://interactive-examples.mdn.mozilla.net https://test-videos.co.uk https://samplelib.com https://download.samplelib.com; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Instami">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' https://images.unsplash.com https://*.supabase.co blob: data:; media-src blob: https://interactive-examples.mdn.mozilla.net https://test-videos.co.uk https://samplelib.com https://download.samplelib.com; connect-src https://*.supabase.co; manifest-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Instami — Meet your kind of people</title>
   <style>
@@ -337,7 +343,33 @@
     .video-controls .mini-btn[aria-pressed="false"] { color: #c94f57; background: #fdeceb; }
     html[data-theme="dark"] .fix-bar { color: #aeeacd; background: #15251f; }
     html[data-theme="dark"] .icebreakers.smart button { color: #aeeacd; background: #15251f; border-color: #234a3a; }
+    .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
     .interest.light { border-color: #f0e5df; color: #77645a; background: #fff; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .photo-slot { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border: 1px dashed #d9cbc2; border-radius: 12px; background: #f7f1ed; }
+    .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-slot button { position: absolute; top: 4px; right: 4px; display: grid; width: 22px; height: 22px; place-items: center; border: 0; border-radius: 50%; color: #fff; background: #1b1513b0; font-size: 12px; }
+    .photo-slot.add { display: grid; place-items: center; color: #c9526a; font-size: 26px; border-color: #e4b7b9; }
+    .photo-slot .main-tag { position: absolute; bottom: 4px; left: 4px; padding: 2px 6px; border-radius: 8px; color: #fff; background: #e75b6b; font-size: 8px; font-weight: 800; }
+    .perk-list { display: grid; gap: 10px; margin: 16px 0 6px; padding: 0; list-style: none; font-size: 12px; }
+    .perk-list li { display: flex; gap: 10px; align-items: center; }
+    .plan-row { display: flex; gap: 8px; margin-top: 14px; }
+    .plan { flex: 1; padding: 12px 6px; border: 2px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink); text-align: center; font-size: 11px; }
+    .plan strong { display: block; font-size: 15px; }
+    .plan[aria-pressed="true"] { border-color: #f5b400; background: #fff8e1; }
+    .plan em { display: block; margin-bottom: 4px; color: #b57f00; font-size: 9px; font-style: normal; font-weight: 800; }
+    .gold-tag { margin-left: 6px; padding: 2px 6px; border-radius: 8px; color: #4a3500; background: linear-gradient(100deg,#ffd75e,#f5b400); font-size: 9px; font-weight: 900; vertical-align: middle; }
+    .like-card.locked img { filter: blur(22px) brightness(.9); transform: scale(1.15); }
+    .like-card.locked .like-card-info { filter: blur(5px); }
+    .like-card.locked button { display: none; }
+    .gold-cta { display: flex; width: 100%; align-items: center; gap: 10px; margin: 12px 0 0; padding: 13px 14px; border: 0; border-radius: 14px; color: #4a3500; background: linear-gradient(100deg,#ffe28a,#f5b400); text-align: left; font-size: 12px; font-weight: 700; }
+    .gold-cta small { display: block; font-weight: 500; font-size: 10px; }
+    .steps { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    code { padding: 1px 5px; border-radius: 5px; background: #f2e9e3; font-size: 11px; }
+    html[data-theme="dark"] .plan { background: #241c1a; border-color: #382d2a; }
+    html[data-theme="dark"] .plan[aria-pressed="true"] { background: #3a3014; border-color: #f5b400; }
+    html[data-theme="dark"] code, html[data-theme="dark"] .photo-slot { background: #241c1a; border-color: #382d2a; }
+    .progress-track span#completion-bar { width: 78%; transition: width .4s; }
     .bottom-nav .nav-button { min-width: 50px; padding: 3px 5px; }
     .invite-banner { display: flex; width: 100%; align-items: center; gap: 12px; margin-top: 14px; padding: 13px 15px; border: 0; border-radius: 16px; color: #fff; background: linear-gradient(100deg,#f27e7b,#e75b6b); text-align: left; }
     .invite-banner strong { display: block; font-size: 13px; }
@@ -519,12 +551,15 @@
     <section class="view" id="profile-view" aria-label="Your profile and settings">
       <div class="view-heading"><div><h1>Your space.</h1><p>Show them what makes you, you.</p></div></div>
       <div class="profile-card">
-        <div class="my-profile"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Your profile photo"><div><h2>Jordan, 29 <span id="my-verified" title="Verified" hidden>✅</span></h2><p id="my-bio">Brooklyn · here for something real</p></div></div>
-        <div class="profile-completion"><div class="completion-label"><span>Your profile is looking good</span><span>78%</span></div><div class="progress-track"><span></span></div></div>
+        <div class="my-profile"><img id="my-photo" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="Your profile photo"><div><h2><span id="my-name">Jordan, 29</span> <span id="my-verified" title="Verified" hidden>✅</span><span class="gold-tag" id="gold-tag" hidden>GOLD</span></h2><p id="my-bio">Brooklyn · here for something real</p></div></div>
+        <div class="profile-completion"><div class="completion-label"><span id="completion-text">Your profile is looking good</span><span id="completion-pct">78%</span></div><div class="progress-track"><span id="completion-bar"></span></div></div>
       </div>
       <h2 class="section-title">Your settings</h2>
       <div class="setting-list">
-        <button class="setting-row" type="button" data-action="edit"><svg><use href="#i-user"/></svg><span>Edit my profile</span><small>78% complete</small></button>
+        <button class="setting-row" type="button" id="profile-gold"><svg><use href="#i-star"/></svg><span>Instami Gold</span><small id="gold-small">Try free</small></button>
+        <button class="setting-row" type="button" data-action="edit"><svg><use href="#i-user"/></svg><span>Edit my profile</span><small id="edit-small">78% complete</small></button>
+        <button class="setting-row" type="button" id="profile-account"><svg><use href="#i-key"/></svg><span>Account &amp; cloud sync</span><small id="account-small">Off</small></button>
+        <button class="setting-row" type="button" id="profile-install" hidden><svg><use href="#i-download"/></svg><span>Install Instami app</span><small>Home screen</small></button>
         <button class="setting-row" type="button" id="profile-invite"><svg><use href="#i-spark"/></svg><span>Invite &amp; rewards</span><small>Earn Boosts</small></button>
         <button class="setting-row" type="button" id="profile-filters"><svg><use href="#i-filter"/></svg><span>Discovery preferences</span><small>Age, distance</small></button>
         <button class="setting-row" type="button" data-action="privacy"><svg><use href="#i-shield"/></svg><span>Security center</span><small id="profile-sec-score">Review</small></button>
@@ -597,11 +632,60 @@
   <div class="backdrop" id="interests-modal" role="dialog" aria-modal="true" aria-labelledby="interests-title">
     <section class="sheet">
       <div class="sheet-handle"></div>
-      <div class="sheet-head"><div><h2 id="interests-title">Edit my profile</h2><p>Your bio and interests shape your match percentage and top picks.</p></div><button class="close-button" data-close type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
-      <div class="filter-group"><div class="filter-label"><span>About me</span><span id="bio-count">0/120</span></div><input class="text-input" id="bio-input" type="text" maxlength="120" placeholder="Brooklyn · here for something real" autocomplete="off" spellcheck="true" aria-label="About me"></div>
+      <div class="sheet-head"><div><h2 id="interests-title">Set up your profile</h2><p id="setup-sub">Real photos and a real bio get far more matches. You must be 18 or older.</p></div><button class="close-button" data-close type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+      <div class="two-col">
+        <div class="filter-group"><div class="filter-label"><span>First name</span></div><input class="text-input" id="name-input" type="text" maxlength="30" placeholder="Jordan" autocomplete="given-name" aria-label="First name"></div>
+        <div class="filter-group"><div class="filter-label"><span>Age</span></div><input class="text-input" id="age-input" type="number" inputmode="numeric" min="18" max="99" placeholder="18+" aria-label="Age"></div>
+      </div>
+      <div class="filter-group"><div class="filter-label"><span>City</span></div><input class="text-input" id="city-input" type="text" maxlength="40" placeholder="Brooklyn, NY" autocomplete="address-level2" aria-label="City"></div>
+      <div class="filter-group"><div class="filter-label"><span>About me</span><span id="bio-count">0/120</span></div><input class="text-input" id="bio-input" type="text" maxlength="120" placeholder="Here for something real" autocomplete="off" spellcheck="true" aria-label="About me"></div>
+      <div class="filter-label" style="margin-top:18px"><span>My photos</span><span id="photo-count">0/6</span></div>
+      <div class="photo-grid" id="photo-grid"></div>
+      <input id="photo-input" type="file" accept="image/*" multiple hidden>
+      <p class="reward-note">Photos stay on this device unless you sign in to cloud sync. Remove metadata-heavy originals if you prefer: we resize and strip location data automatically.</p>
       <div class="filter-label" style="margin-top:18px"><span>My interests</span></div>
       <div class="interest-list" id="interest-chips"></div>
       <button class="primary-cta" id="interests-save" type="button">Save my profile</button>
+    </section>
+  </div>
+
+  <div class="backdrop" id="premium-modal" role="dialog" aria-modal="true" aria-labelledby="premium-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="premium-title">Instami Gold</h2><p>More ways to meet the right people.</p></div><button class="close-button" data-close type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+      <ul class="perk-list">
+        <li>👀 <span><strong>See who likes you</strong> and match instantly</span></li>
+        <li>⭐ <span><strong>10 Super Likes</strong> a day (free: 3)</span></li>
+        <li>↩ <span><strong>Unlimited Rewinds</strong> (free: 3 a day)</span></li>
+        <li>🚀 <span><strong>1 free Boost</strong> every week</span></li>
+        <li>♾️ <span><strong>Unlimited likes</strong> (free: 50 a day)</span></li>
+      </ul>
+      <div class="plan-row" id="plan-row"></div>
+      <button class="primary-cta" id="plan-start" type="button">Start 7-day free trial</button>
+      <button class="mini-btn" id="plan-cancel" type="button" style="width:100%;margin-top:8px" hidden>Cancel Gold</button>
+      <p class="reward-note">Prototype: no payment is taken and the plan is stored only on this device. A real launch needs Google Play Billing / Apple In-App Purchase or Stripe, with the plan verified on your server (the schema’s <code>premium_until</code> column is reserved for that).</p>
+    </section>
+  </div>
+
+  <div class="backdrop" id="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-title">
+    <section class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><div><h2 id="account-title">Account &amp; cloud sync</h2><p id="account-sub"></p></div><button class="close-button" data-close type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button></div>
+      <div id="account-off" hidden>
+        <p class="event-desc">Cloud sync is off because no backend is configured. To connect a free Supabase project:</p>
+        <ol class="steps"><li>Create a project at supabase.com and run <code>supabase/schema.sql</code> in the SQL editor.</li><li>Copy the project URL and anon key into <code>config.js</code>.</li><li>In Supabase Auth settings, keep email sign-in on, and add your site URL.</li><li>Reload the app and sign in here.</li></ol>
+      </div>
+      <div id="account-in" hidden>
+        <div class="input-row" style="margin-top:14px"><input class="text-input" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com" aria-label="Email"><button class="mini-btn primary" id="acct-send" type="button">Send code</button></div>
+        <div class="input-row" id="acct-code-row" hidden><input class="text-input" id="acct-code" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="Code from your email" aria-label="Email code"><button class="mini-btn primary" id="acct-verify" type="button">Verify</button></div>
+      </div>
+      <div id="account-signed" hidden>
+        <div class="reward-stats"><div><strong id="acct-people">0</strong><span>People nearby</span></div><div><strong id="acct-matches">0</strong><span>Cloud matches</span></div></div>
+        <div class="input-row"><button class="mini-btn primary" id="acct-sync" type="button" style="flex:1">Sync my profile</button><button class="mini-btn" id="acct-out" type="button" style="flex:1">Sign out</button></div>
+        <button class="mini-btn" id="acct-delete" type="button" style="width:100%;margin-top:8px;color:#c94f57">Delete my cloud data</button>
+        <p class="reward-note">Cloud chats are protected by TLS and database access rules, but they are not end-to-end encrypted like the on-device demo chats.</p>
+      </div>
+      <p class="reward-note" id="acct-status" role="status"></p>
     </section>
   </div>
 
@@ -730,6 +814,8 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="qrcode.js"></script>
+  <script src="config.js"></script>
+  <script src="backend.js"></script>
   <script>
     (() => {
       const profiles = [
@@ -880,11 +966,21 @@
           grid.append(empty);
         }
         admirers.forEach((person, index) => {
+          const locked = !isGold() && index > 0;
           const el = document.createElement("article");
-          el.className = "like-card";
-          el.innerHTML = `${safeImage(person.photo, `${person.name}'s profile`)}<span class="pick-score">${compat(person)}% match</span><button type="button" data-like-person="${index}" aria-label="Like ${esc(person.name)} back"><svg><use href="#i-heart"/></svg></button><div class="like-card-info"><strong>${esc(person.name)}, ${person.age}</strong><span>${esc(person.distance)}</span></div>`;
+          el.className = `like-card${locked ? " locked" : ""}`;
+          el.innerHTML = `${safeImage(person.photo, locked ? "Hidden admirer" : `${person.name}'s profile`)}<span class="pick-score">${compat(person)}% match</span><button type="button" data-like-person="${index}" aria-label="Like ${esc(person.name)} back"><svg><use href="#i-heart"/></svg></button><div class="like-card-info"><strong>${locked ? "Someone" : `${esc(person.name)}, ${person.age}`}</strong><span>${locked ? "Go Gold to see" : esc(person.distance)}</span></div>`;
           grid.append(el);
         });
+        if (!isGold() && admirers.length > 1) {
+          const cta = document.createElement("button");
+          cta.type = "button";
+          cta.className = "gold-cta";
+          cta.style.gridColumn = "1 / -1";
+          cta.innerHTML = `<span style="font-size:22px">👑</span><span>See everyone who likes you<small>Try Instami Gold free for 7 days</small></span>`;
+          cta.addEventListener("click", () => openModal("premium-modal"));
+          grid.append(cta);
+        }
         $("#likes-badge").textContent = String(admirers.length);
         $("#likes-badge").hidden = admirers.length === 0;
       }
@@ -899,6 +995,7 @@
       }
 
       async function openChat(person) {
+        if (person.remoteMatchId) return openCloudChat(person);
         activeMatch = person;
         activeChat = person;
         $("#chat-name").textContent = person.name;
@@ -935,21 +1032,47 @@
         if (modal.id === "create-modal" || modal.id === "verify-modal" || modal.id === "video-modal") stopCam();
       }
 
-      function likeProfile(person = activeMatch) {
-        if (!matches.some((match) => match.name === person.name)) {
+      function makeMatch(person, quiet = false) {
+        const same = (other) => (person.remoteId ? other.remoteId === person.remoteId : other.name === person.name);
+        if (!matches.some(same)) {
           matches.unshift(person);
           pushNotification(`It’s a match with ${person.name} 💘`);
         }
-        const waiting = admirers.findIndex((admirer) => admirer.name === person.name);
+        const waiting = admirers.findIndex(same);
         if (waiting >= 0) admirers.splice(waiting, 1);
         latestMatched = person;
         renderLikes();
         renderConversations();
         $("#chat-badge").hidden = false;
+        if (quiet) return showToast(`${person.name} liked you back 💘 Say hello in Chats`);
         $("#match-person").textContent = person.name;
         $("#match-photo").src = person.photo;
         $("#match-photo").alt = `${person.name}, your new match`;
         $("#match-modal").classList.add("open");
+      }
+
+      // Prototype matching: a stable pseudo-random result per person, so not everyone likes you back.
+      const pendingLikes = new Set();
+      function likeScore(person) {
+        let h = 0;
+        for (const ch of person.name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+        return h % 100;
+      }
+      function likeProfile(person = activeMatch, superLike = false) {
+        if (person.remoteId) return cloudSwipe(person, superLike ? "super" : "like");
+        const same = (other) => other.name === person.name;
+        if (matches.some(same) || admirers.some(same)) return makeMatch(person);
+        const score = likeScore(person) - (superLike ? 25 : 0);
+        if (score < 45) return makeMatch(person);
+        if (score < 70) {
+          showToast(`Liked ${person.name} ✓ We’ll tell you if they like you back`);
+          if (!pendingLikes.has(person.name)) {
+            pendingLikes.add(person.name);
+            window.setTimeout(() => { pendingLikes.delete(person.name); makeMatch(person, true); }, 7000 + (score % 5) * 1000);
+          }
+          return;
+        }
+        showToast(`Liked ${person.name} ✓ We’ll tell you if they like you back`);
       }
 
       document.querySelectorAll(".nav-button").forEach((button) => {
@@ -964,20 +1087,25 @@
       }
       function doPass() {
         passHistory.push(profileIndex);
+        if (activeMatch.remoteId) InstamiBackend.swipe(activeMatch.remoteId, "pass").catch(() => {});
         advance();
         showToast("On to someone new ✨");
       }
       function doLike() {
+        settings.likesUsed++;
+        saveSettings();
         likeProfile();
         advance();
       }
       function doSuper() {
         superLikes--;
-        if (superLikes < settings.bonusSuper) { settings.bonusSuper = superLikes; saveSettings(); }
+        settings.likesUsed++;
+        if (superLikes < settings.bonusSuper) { settings.bonusSuper = superLikes; }
+        saveSettings();
         updateSuperLike();
         buzz(25);
         activeMatch.pendingComment = `⭐ Super Like — you stood out to me!`;
-        likeProfile();
+        likeProfile(activeMatch, true);
         advance();
       }
       function resetCard() {
@@ -989,6 +1117,12 @@
       }
       function swipeAction(dir) {
         if (deckIsEmpty || flying) return;
+        rollUsage();
+        if (dir !== "pass" && !isGold() && settings.likesUsed >= 50) {
+          resetCard();
+          showToast("You’ve used today’s 50 likes. Go Gold for unlimited.");
+          return openModal("premium-modal");
+        }
         if (dir === "super" && superLikes <= 0) {
           resetCard();
           return showToast("No Super Likes left today. Invite friends or check in at an event to earn more.");
@@ -1014,6 +1148,13 @@
       $("#pass-button").addEventListener("click", () => swipeAction("pass"));
       $("#rewind-button").addEventListener("click", () => {
         if (!passHistory.length) return showToast("Nothing to rewind yet.");
+        rollUsage();
+        if (!isGold() && settings.rewindsUsed >= 3) {
+          showToast("You’ve used today’s 3 free rewinds. Go Gold for unlimited.");
+          return openModal("premium-modal");
+        }
+        settings.rewindsUsed++;
+        saveSettings();
         profileIndex = passHistory.pop();
         seen.delete(profiles[profileIndex].name);
         renderProfile();
@@ -1112,7 +1253,15 @@
         $("#icebreakers").hidden = true;
         lastFix = null;
         showRisk(message);
-        const chat = await chatFor(person);
+        if (person.remoteMatchId) {
+          try {
+            await InstamiBackend.sendMessage(person.remoteMatchId, message);
+            person.preview = message;
+            renderConversations();
+            await refreshCloudChat(person);
+          } catch { showToast("Message not sent. Check your connection."); input.value = message; }
+          return;
+        }
         await pushMessage(chat, "me", message);
         addBubble("me", message);
         person.preview = message;
@@ -1166,7 +1315,12 @@
       const td = new TextDecoder();
       const b64e = (bytes) => btoa(String.fromCharCode(...bytes));
       const b64d = (text) => Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
-      const openModal = (id) => { $(`#${id}`).classList.add("open"); if (id === "security-modal") renderSecurity(); };
+      const openModal = (id) => {
+        $(`#${id}`).classList.add("open");
+        if (id === "security-modal") renderSecurity();
+        if (id === "premium-modal") renderPremium();
+        if (id === "account-modal") renderAccount();
+      };
       const ALL_INTERESTS = ["Live music", "Good food", "Weekend trips", "Hiking", "Cooking", "Dogs", "Photography", "Tacos", "Art", "Bookshops", "Pasta", "Museums", "Puns", "Long walks"];
       const defaultInterests = ["live music", "good food", "hiking", "art", "museums", "photography", "cooking", "tacos", "long walks"];
       const UNKIND = /\b(ugly|stupid|idiot|shut up|hate you|loser|slut|bitch|fat)\b/i;
@@ -1191,7 +1345,7 @@
 
       // ===== Settings, privacy & app lock =====
       const SKEY = "instami.settings.v1";
-      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], interests: [], autoCorrect: true, bio: "", refCode: "", referrals: 0, bonusSuper: 0, boosts: 0, boostUntil: 0, going: [], checkedIn: [], promos: [], failCount: 0, lockUntil: 0 };
+      const settings = { incognito: false, hideDistance: false, blurPhotos: false, hidePreviews: false, autoLock: true, dark: false, verified: false, passkey: false, pinHash: null, pinSalt: null, blocked: [], following: ["Alex"], interests: [], autoCorrect: true, bio: "", name: "Jordan", age: 29, city: "Brooklyn, NY", photos: [], profileDone: false, setupAsked: false, plan: "", planUntil: 0, rewindsUsed: 0, likesUsed: 0, usageDay: "", weeklyBoostWeek: "", refCode: "", referrals: 0, bonusSuper: 0, boosts: 0, boostUntil: 0, going: [], checkedIn: [], promos: [], failCount: 0, lockUntil: 0 };
       try {
         const saved = JSON.parse(localStorage.getItem(SKEY) || "{}");
         Object.keys(settings).forEach((key) => {
@@ -1199,12 +1353,12 @@
         });
       } catch { /* ignore corrupt settings */ }
       function saveSettings() {
-        try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch { /* storage unavailable */ }
+        try { localStorage.setItem(SKEY, JSON.stringify(settings)); return true; } catch { return false; }
       }
       function applySettings() {
         document.documentElement.dataset.theme = settings.dark ? "dark" : "light";
         document.body.classList.toggle("blur-photos", settings.blurPhotos);
-        $("#location-text").textContent = settings.incognito ? "Incognito" : "Brooklyn, NY";
+        $("#location-text").textContent = settings.incognito ? "Incognito" : (settings.city || "Brooklyn, NY");
         $("#my-verified").hidden = !settings.verified;
       }
       async function hashPin(pin, saltB64) {
@@ -2024,7 +2178,7 @@
         settings.refCode = "JORD" + Array.from(crypto.getRandomValues(new Uint8Array(4)), (n) => alphabet[n % alphabet.length]).join("");
         saveSettings();
       }
-      superLikes += settings.bonusSuper;
+      superLikes = (isGold() ? 10 : 3) + settings.bonusSuper;
       const inviteLink = () => `https://instami.app/join?ref=${settings.refCode}`;
       function qrSvg(text) {
         if (typeof qrcode !== "function") return "";
@@ -2260,13 +2414,94 @@
           grid.append(el);
         });
       }
+      const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80";
+      const todayKey = () => new Date().toISOString().slice(0, 10);
+      function isGold() { return settings.plan === "gold" && settings.planUntil > Date.now(); }
+      function rollUsage() {
+        if (settings.usageDay !== todayKey()) { settings.usageDay = todayKey(); settings.rewindsUsed = 0; settings.likesUsed = 0; saveSettings(); }
+      }
+      function completion() {
+        const points = [[settings.name.trim().length > 0, 15], [settings.age >= 18, 10], [settings.city.trim().length > 0, 10], [settings.bio.trim().length >= 10, 20], [settings.interests.length >= 3, 15]];
+        const photoPoints = Math.min(3, settings.photos.length) * 10;
+        return points.reduce((sum, [ok, pts]) => sum + (ok ? pts : 0), photoPoints);
+      }
       function renderBio() {
-        $("#my-bio").textContent = settings.bio || "Brooklyn · here for something real";
+        const pct = completion();
+        $("#my-name").textContent = `${settings.name || "You"}, ${settings.age}`;
+        $("#my-photo").src = settings.photos[0] || DEFAULT_AVATAR;
+        $("#my-bio").textContent = settings.bio || settings.city || "Add a bio to stand out";
+        $("#gold-tag").hidden = !isGold();
+        $("#completion-pct").textContent = `${pct}%`;
+        $("#completion-bar").style.width = `${pct}%`;
+        $("#completion-text").textContent = pct >= 90 ? "Your profile is looking great" : "Finish your profile to get more matches";
+        $("#edit-small").textContent = `${pct}% complete`;
+        $("#gold-small").textContent = isGold() ? `Active · ${Math.ceil((settings.planUntil - Date.now()) / 86400000)}d left` : "Try free";
+        const mineImg = document.querySelector(".match-people img");
+        if (mineImg) mineImg.src = settings.photos[0] || mineImg.src;
       }
       $("#bio-input").addEventListener("input", (event) => { $("#bio-count").textContent = `${event.target.value.length}/120`; });
-      function openInterests() {
+
+      let draftPhotos = [];
+      const MAX_PHOTOS = 6;
+      async function toJpeg(file) {
+        if (!file.type.startsWith("image/") || file.size > 20 * 1024 * 1024) throw new Error("Please choose an image under 20 MB.");
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, 800 / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close();
+        return canvas.toDataURL("image/jpeg", 0.8);
+      }
+      function renderPhotoGrid() {
+        const grid = $("#photo-grid");
+        grid.replaceChildren();
+        draftPhotos.forEach((src, index) => {
+          const slot = document.createElement("div");
+          slot.className = "photo-slot";
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = `Your photo ${index + 1}`;
+          img.title = index === 0 ? "Main photo" : "Tap to make main photo";
+          img.addEventListener("click", () => { if (index) { draftPhotos.unshift(...draftPhotos.splice(index, 1)); renderPhotoGrid(); } });
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.textContent = "✕";
+          remove.setAttribute("aria-label", `Remove photo ${index + 1}`);
+          remove.addEventListener("click", () => { draftPhotos.splice(index, 1); renderPhotoGrid(); });
+          slot.append(img, remove);
+          if (index === 0) { const tag = document.createElement("span"); tag.className = "main-tag"; tag.textContent = "MAIN"; slot.append(tag); }
+          grid.append(slot);
+        });
+        if (draftPhotos.length < MAX_PHOTOS) {
+          const add = document.createElement("button");
+          add.type = "button";
+          add.className = "photo-slot add";
+          add.textContent = "+";
+          add.setAttribute("aria-label", "Add photos");
+          add.addEventListener("click", () => $("#photo-input").click());
+          grid.append(add);
+        }
+        $("#photo-count").textContent = `${draftPhotos.length}/${MAX_PHOTOS}`;
+      }
+      $("#photo-input").addEventListener("change", async (event) => {
+        const files = [...event.target.files].slice(0, MAX_PHOTOS - draftPhotos.length);
+        event.target.value = "";
+        for (const file of files) {
+          try { draftPhotos.push(await toJpeg(file)); } catch (error) { showToast(error.message || "Couldn’t read that photo."); }
+        }
+        renderPhotoGrid();
+      });
+      function openInterests(first = false) {
+        draftPhotos = [...settings.photos];
+        $("#name-input").value = settings.profileDone || !first ? settings.name : "";
+        $("#age-input").value = settings.profileDone || !first ? settings.age : "";
+        $("#city-input").value = settings.city;
         $("#bio-input").value = settings.bio;
         $("#bio-count").textContent = `${settings.bio.length}/120`;
+        $("#interests-title").textContent = first ? "Welcome to Instami 👋" : "Edit my profile";
+        renderPhotoGrid();
         const mine = new Set(settings.interests.length ? settings.interests : ALL_INTERESTS.filter((i) => defaultInterests.includes(i.toLowerCase())));
         $("#interest-chips").replaceChildren(...ALL_INTERESTS.map((interest) => {
           const chip = document.createElement("button");
@@ -2279,21 +2514,230 @@
         }));
         openModal("interests-modal");
       }
-      $("#interests-save").addEventListener("click", () => {
+      $("#interests-save").addEventListener("click", async () => {
         const chosen = [...document.querySelectorAll("#interest-chips .chip-toggle")].filter((chip) => chip.getAttribute("aria-pressed") === "true").map((chip) => chip.textContent);
+        const name = $("#name-input").value.trim().replace(/[<>]/g, "");
+        const age = Number.parseInt($("#age-input").value, 10);
+        if (!name) return showToast("Please add your first name.");
+        if (!Number.isInteger(age) || age < 18) return showToast("Instami is for adults. You must be 18 or older.");
+        if (age > 99) return showToast("Please enter a valid age.");
         if (!chosen.length) return showToast("Pick at least one interest.");
-        settings.interests = chosen;
-        settings.bio = $("#bio-input").value.trim().slice(0, 120);
+        const before = { ...settings };
+        Object.assign(settings, { interests: chosen, bio: $("#bio-input").value.trim().slice(0, 120), name, age, city: $("#city-input").value.trim().slice(0, 40), photos: draftPhotos, profileDone: true });
+        if (!saveSettings()) {
+          Object.assign(settings, before);
+          return showToast("Not enough storage for those photos. Remove one and try again.");
+        }
         renderBio();
-        saveSettings();
         closeModal($("#interests-modal"));
         renderProfile();
         renderPicks();
-        showToast("Matches refreshed with your interests ✨");
+        showToast("Profile saved ✨");
+        if (window.InstamiBackend && InstamiBackend.isSignedIn()) syncMyProfile().catch(() => showToast("Saved here, but cloud sync failed."));
+      });
+
+      // ===== Gold plan (prototype: simulated, stored on this device only) =====
+      const PLANS = [
+        { id: "1m", label: "1 month", price: "$9.99" },
+        { id: "6m", label: "6 months", price: "$39.99", tag: "SAVE 33%" },
+        { id: "12m", label: "12 months", price: "$59.99", tag: "BEST VALUE" }
+      ];
+      let chosenPlan = "6m";
+      function renderPremium() {
+        const active = isGold();
+        $("#plan-row").replaceChildren(...PLANS.map((plan) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "plan";
+          button.setAttribute("aria-pressed", String(plan.id === chosenPlan));
+          button.innerHTML = `<em>${plan.tag || "&nbsp;"}</em>${esc(plan.label)}<strong>${plan.price}</strong>`;
+          button.addEventListener("click", () => { chosenPlan = plan.id; renderPremium(); });
+          return button;
+        }));
+        $("#plan-row").hidden = active;
+        $("#plan-start").hidden = active;
+        $("#plan-cancel").hidden = !active;
+      }
+      $("#plan-start").addEventListener("click", () => {
+        settings.plan = "gold";
+        settings.planUntil = Date.now() + 7 * 86400000;
+        const week = String(Math.floor(Date.now() / (7 * 86400000)));
+        if (settings.weeklyBoostWeek !== week) { settings.weeklyBoostWeek = week; settings.boosts++; }
+        superLikes += 7;
+        saveSettings();
+        updateSuperLike();
+        renderBio();
+        renderLikes();
+        closeModal($("#premium-modal"));
+        showToast("Welcome to Gold 👑 Your 7-day free trial has started");
+      });
+      $("#plan-cancel").addEventListener("click", () => {
+        settings.plan = "";
+        settings.planUntil = 0;
+        superLikes = Math.min(superLikes, 3 + settings.bonusSuper);
+        saveSettings();
+        updateSuperLike();
+        renderBio();
+        renderLikes();
+        closeModal($("#premium-modal"));
+        showToast("Gold cancelled");
+      });
+      $("#profile-gold").addEventListener("click", () => openModal("premium-modal"));
+
+      // ===== Cloud account (Supabase) =====
+      const cloud = window.InstamiBackend;
+      const okPhoto = (url) => typeof url === "string" && /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\/photos\/[A-Za-z0-9/._-]+$/.test(url);
+      const clip = (value, max) => String(value || "").replace(/[<>]/g, "").slice(0, max);
+      function remoteToLocal(row, matchId) {
+        const bio = clip(row.bio, 300);
+        return {
+          name: clip(row.name, 40) || "Member", age: Number(row.age) || 18, job: clip(row.job, 60) || clip(row.city, 40) || "Instami member",
+          distance: "Nearby", miles: 5, verified: row.verified === true, photo: okPhoto((row.photos || [])[0]) ? row.photos[0] : DEFAULT_AVATAR,
+          bio: bio || "New on Instami.", interests: (Array.isArray(row.interests) ? row.interests : []).slice(0, 6).map((i) => clip(i, 24)),
+          prompt: ["About me", bio || "Say hello and find out."], opener: "", remoteId: row.id, remoteMatchId: matchId || ""
+        };
+      }
+      async function loadCloudMatches(rows) {
+        const list = rows || (await cloud.matches()) || [];
+        const me = cloud.userId();
+        const known = new Set(matches.map((m) => m.remoteMatchId).filter(Boolean));
+        const fresh = list.filter((m) => !known.has(m.id));
+        if (!fresh.length) return;
+        const people = (await cloud.profilesByIds(fresh.map((m) => (m.user_a === me ? m.user_b : m.user_a)))) || [];
+        fresh.forEach((m) => {
+          const other = people.find((p) => p.id === (m.user_a === me ? m.user_b : m.user_a));
+          if (other) matches.push(remoteToLocal(other, m.id));
+        });
+        renderConversations();
+      }
+      async function loadCloud() {
+        if (!cloud || !cloud.isSignedIn()) return;
+        const [people, rows] = await Promise.all([cloud.discover(30), cloud.matches()]);
+        const have = new Set(profiles.map((p) => p.remoteId).filter(Boolean));
+        (people || []).forEach((row) => { if (!have.has(row.id)) profiles.push(remoteToLocal(row)); });
+        await loadCloudMatches(rows || []);
+        renderProfile();
+        renderPicks();
+      }
+      async function syncMyProfile() {
+        const urls = [];
+        for (const photo of settings.photos.slice(0, MAX_PHOTOS)) {
+          if (photo.startsWith("data:")) urls.push(await cloud.uploadPhoto(await (await fetch(photo)).blob()));
+          else urls.push(photo);
+        }
+        await cloud.saveMyProfile({ name: settings.name, age: settings.age, bio: settings.bio, city: settings.city, interests: settings.interests, photos: urls });
+      }
+      async function cloudSwipe(person, action) {
+        try {
+          const matched = await cloud.swipe(person.remoteId, action);
+          if (matched) {
+            await loadCloudMatches();
+            makeMatch(matches.find((m) => m.remoteId === person.remoteId) || person);
+          } else showToast(`Liked ${person.name} ✓ We’ll tell you if they like you back`);
+        } catch { showToast("Couldn’t reach the server. Try again."); }
+      }
+      let cloudTimer;
+      async function refreshCloudChat(person) {
+        const rows = (await cloud.messages(person.remoteMatchId)) || [];
+        const signature = rows.length ? `${rows.length}:${rows[rows.length - 1].id}` : "0";
+        if (person.shownSig === signature) return;
+        person.shownSig = signature;
+        $("#chat-body").replaceChildren();
+        rows.forEach((row) => addBubble(row.sender === cloud.userId() ? "me" : "them", String(row.body)));
+        const last = [...rows].reverse().find((row) => row.sender !== cloud.userId());
+        renderSmart(last ? String(last.body) : "");
+      }
+      async function openCloudChat(person) {
+        activeMatch = person;
+        activeChat = person;
+        person.shownSig = "";
+        $("#chat-name").textContent = person.name;
+        $("#chat-avatar").src = person.photo;
+        $("#chat-body").replaceChildren();
+        $("#risk-banner").hidden = true;
+        $("#icebreakers").hidden = true;
+        $("#smart-replies").hidden = true;
+        renderFixBar([]);
+        $("#e2ee-badge").textContent = "🔐 Cloud chat · encrypted in transit, not end-to-end";
+        $("#chat-view").classList.add("open");
+        $("#chat-view").setAttribute("aria-label", `Chat with ${person.name}`);
+        $("#chat-badge").hidden = true;
+        window.clearInterval(cloudTimer);
+        try { await refreshCloudChat(person); } catch { showToast("Couldn’t load messages."); }
+        cloudTimer = window.setInterval(() => {
+          if (activeChat === person && $("#chat-view").classList.contains("open")) refreshCloudChat(person).catch(() => {});
+          else window.clearInterval(cloudTimer);
+        }, 4000);
+        $("#chat-input").focus();
+      }
+
+      const acct = (id) => $(`#${id}`);
+      function renderAccount() {
+        const signed = cloud && cloud.isSignedIn();
+        acct("account-off").hidden = Boolean(cloud && cloud.enabled);
+        acct("account-in").hidden = !(cloud && cloud.enabled) || signed;
+        acct("account-signed").hidden = !signed;
+        acct("acct-code-row").hidden = true;
+        acct("account-sub").textContent = signed ? `Signed in as ${cloud.email()}` : "Sync your profile and match with real people.";
+        acct("acct-people").textContent = String(profiles.filter((p) => p.remoteId).length);
+        acct("acct-matches").textContent = String(matches.filter((m) => m.remoteMatchId).length);
+        acct("acct-status").textContent = "";
+        acct("account-small").textContent = signed ? "Signed in" : cloud && cloud.enabled ? "Sign in" : "Not set up";
+      }
+      const setAcctStatus = (text) => { acct("acct-status").textContent = text; };
+      acct("acct-send").addEventListener("click", async () => {
+        const email = acct("acct-email").value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setAcctStatus("Enter a valid email address.");
+        try { await cloud.sendCode(email); acct("acct-code-row").hidden = false; setAcctStatus("We emailed you a sign-in code."); } catch (error) { setAcctStatus(error.message); }
+      });
+      acct("acct-verify").addEventListener("click", async () => {
+        try {
+          await cloud.verifyCode(acct("acct-email").value.trim(), acct("acct-code").value.trim());
+          if (settings.profileDone) await syncMyProfile();
+          await loadCloud();
+          renderAccount();
+          setAcctStatus(settings.profileDone ? "Signed in and synced." : "Signed in. Finish your profile, then tap Sync.");
+        } catch (error) { setAcctStatus(error.message); }
+      });
+      acct("acct-sync").addEventListener("click", async () => {
+        if (!settings.profileDone) return setAcctStatus("Finish editing your profile first.");
+        try { await syncMyProfile(); await loadCloud(); renderAccount(); setAcctStatus("Profile synced."); } catch (error) { setAcctStatus(error.message); }
+      });
+      function dropCloudData() {
+        for (let i = profiles.length - 1; i >= 0; i--) if (profiles[i].remoteId) profiles.splice(i, 1);
+        for (let i = matches.length - 1; i >= 0; i--) if (matches[i].remoteId) matches.splice(i, 1);
+        window.clearInterval(cloudTimer);
+        profileIndex = 0;
+        renderProfile();
+        renderConversations();
+        renderPicks();
+      }
+      acct("acct-out").addEventListener("click", () => { cloud.signOut(); dropCloudData(); renderAccount(); setAcctStatus("Signed out."); });
+      acct("acct-delete").addEventListener("click", async () => {
+        if (!window.confirm("Delete your cloud profile, matches and messages? This can’t be undone.")) return;
+        try { await cloud.deleteAccountData(); dropCloudData(); renderAccount(); setAcctStatus("Your cloud data was deleted."); } catch (error) { setAcctStatus(error.message); }
+      });
+      $("#profile-account").addEventListener("click", () => openModal("account-modal"));
+      if (cloud && cloud.isSignedIn()) loadCloud().catch(() => showToast("Cloud sync unavailable right now."));
+
+      // ===== PWA =====
+      if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+        window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+      }
+      let installEvent = null;
+      window.addEventListener("beforeinstallprompt", (event) => { event.preventDefault(); installEvent = event; $("#profile-install").hidden = false; });
+      window.addEventListener("appinstalled", () => { $("#profile-install").hidden = true; });
+      $("#profile-install").addEventListener("click", async () => {
+        if (!installEvent) return;
+        installEvent.prompt();
+        await installEvent.userChoice.catch(() => {});
+        installEvent = null;
+        $("#profile-install").hidden = true;
       });
 
       applySettings();
       renderBio();
+      renderAccount();
       renderPicks();
       updateSuperLike();
       renderSecurity();
@@ -2301,7 +2745,13 @@
       renderProfile();
       renderLikes();
       renderConversations();
+      if (viewIds.includes(location.hash.slice(1))) setView(location.hash.slice(1));
       if (settings.pinHash) lock();
+      else if (!settings.profileDone && !settings.setupAsked) {
+        settings.setupAsked = true;
+        saveSettings();
+        window.setTimeout(() => openInterests(true), 500);
+      }
       resetIdle();
     })();
   </script>
